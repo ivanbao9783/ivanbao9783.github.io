@@ -1,5 +1,5 @@
 ---
-title: "AI的肖申克救赎：OpenAI模型自主越狱攻破HuggingFace，GLM52临危救场"
+title: "AI的肖申克救赎：OpenAI模型自主越狱攻破HuggingFace，GLM临危救场"
 author: ivanbao9783
 date: 2026-07-24 15:38:39 +0800
 categories: [技术笔记]
