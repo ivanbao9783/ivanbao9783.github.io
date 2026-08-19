@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark Diff - vLLM 可观测平台</title>
+    <style>
+        :root {
+            --bg: #0f1117; --surface: #181b24; --surface2: #1e2130; --border: #2a2d3a;
+            --text: #e1e4ea; --text2: #8b8fa7; --accent: #6c8cff;
+            --green: #4ade80; --red: #f87171; --yellow: #fbbf24; --orange: #fb923c; --purple: #a78bfa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; }
+
+        .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { padding: 0 20px 20px; font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+        .nav-item { padding: 10px 20px; display: flex; align-items: center; gap: 10px; color: var(--text2); cursor: pointer; font-size: 13px; transition: all 0.15s; }
+        .nav-item:hover { color: var(--text); background: var(--surface2); }
+        .nav-item.active { color: var(--accent); background: var(--surface2); border-right: 2px solid var(--accent); }
+        .nav-icon { width: 18px; text-align: center; }
+
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .tb-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 12px; }
+
+        .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* Version selector row */
+        .version-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+        .version-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; }
+        .version-card.baseline { border-color: var(--border); }
+        .version-card.target { border-color: var(--red); }
+        .version-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); margin-bottom: 8px; }
+        .version-name { font-size: 18px; font-weight: 700; }
+        .version-meta { font-size: 11px; color: var(--text2); margin-top: 4px; }
+        .vs-divider { font-size: 14px; color: var(--text2); font-weight: 700; padding: 0 12px; }
+
+        /* Stat row */
+        .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+        .stat-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+        .stat-delta { font-size: 11px; margin-top: 2px; }
+        .stat-delta.down { color: var(--red); }
+        .stat-delta.up { color: var(--green); }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+
+        /* Diff table */
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 10px 20px; border-bottom: 1px solid var(--border); color: var(--text2); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 10px 20px; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: var(--surface2); }
+
+        .delta-badge { font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+        .delta-badge.red { color: var(--red); background: rgba(248,113,113,0.1); }
+        .delta-badge.green { color: var(--green); background: rgba(74,222,128,0.1); }
+        .delta-badge.neutral { color: var(--text2); }
+
+        .delta-bar { display: inline-block; height: 18px; border-radius: 3px; min-width: 4px; vertical-align: middle; margin-right: 6px; }
+        .delta-bar.red { background: var(--red); }
+        .delta-bar.green { background: var(--green); }
+
+        .regression-flag { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .regression-flag.critical { background: rgba(248,113,113,0.12); color: var(--red); }
+        .regression-flag.warning { background: rgba(251,191,36,0.12); color: var(--yellow); }
+        .regression-flag.ok { color: var(--text2); }
+
+        /* Column layout */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .chart-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+        .chart-box h3 { font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+        .mini-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; padding-top: 8px; }
+        .mini-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .mini-bar-fill { width: 70%; border-radius: 4px 4px 0 0; min-height: 4px; }
+        .mini-bar-label { font-size: 9px; color: var(--text2); text-align: center; }
+        .mini-bar-val { font-size: 9px; font-weight: 600; }
+
+        .legend { display: flex; gap: 16px; margin-top: 12px; font-size: 10px; color: var(--text2); }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+        .insight-box { background: linear-gradient(135deg, rgba(108,140,255,0.06), rgba(167,139,250,0.06)); border: 1px solid rgba(108,140,255,0.2); border-radius: 10px; padding: 20px; }
+        .insight-box h3 { font-size: 14px; color: var(--accent); margin-bottom: 12px; }
+        .insight-list { list-style: none; padding: 0; }
+        .insight-list li { padding: 6px 0; font-size: 12px; color: var(--text); display: flex; align-items: flex-start; gap: 8px; }
+        .insight-list li::before { content: '•'; color: var(--accent); font-weight: 700; }
+
+        .tabs-row { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 3px; }
+        .tab { padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+        .tab.active { background: var(--bg); color: var(--text); font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">⚡ vLLM Observatory</div>
+        <div class="nav-item"><span class="nav-icon">📊</span>评测概览</div>
+        <div class="nav-item"><span class="nav-icon">🔍</span>Badcase 管理</div>
+        <div class="nav-item active"><span class="nav-icon">📈</span>Benchmark Diff</div>
+        <div class="nav-item"><span class="nav-icon">🎯</span>归因分析</div>
+        <div class="nav-item"><span class="nav-icon">📋</span>归因报告</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>设置</div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <span class="topbar-title">📈 Benchmark Diff</span>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+                <span style="font-size:12px;color:var(--text2)">Benchmark:</span>
+                <select class="tb-select"><option>SWE-Bench</option><option>MMLU</option><option>GSM8K</option><option>全部</option></select>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Version selectors -->
+            <div class="version-row">
+                <div class="version-card baseline">
+                    <div class="version-label">Baseline（基线版本）</div>
+                    <select class="tb-select" style="margin-bottom:8px;">
+                        <option>vLLM v0.5.2</option>
+                        <option>vLLM v0.5.0</option>
+                        <option>vLLM v0.4.8</option>
+                    </select>
+                    <div class="version-name" style="color:var(--text);">v0.5.2</div>
+                    <div class="version-meta">qwen-2.5-72b | Run 20260725</div>
+                    <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--green);">Resolved Rate 31.2%</div>
+                </div>
+                <div class="vs-divider">VS</div>
+                <div class="version-card target">
+                    <div class="version-label">Target（对比版本）</div>
+                    <select class="tb-select" style="margin-bottom:8px;">
+                        <option>vLLM v0.6.1</option>
+                        <option>vLLM v0.6.0</option>
+                        <option>vLLM v0.5.2</option>
+                    </select>
+                    <div class="version-name" style="color:var(--red);">v0.6.1</div>
+                    <div class="version-meta">qwen-2.5-72b | Run 20260801</div>
+                    <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--red);">Resolved Rate 25.8%</div>
+                </div>
+            </div>
+
+            <!-- Top-level diff stats -->
+            <div class="stat-row">
+                <div class="stat-card">
+                    <div class="stat-label">Resolved Rate Δ</div>
+                    <div class="stat-value" style="color:var(--red);">-5.4%</div>
+                    <div class="stat-delta down">31.2% → 25.8%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">回归 Repo 数</div>
+                    <div class="stat-value" style="color:var(--red);">5</div>
+                    <div class="stat-delta down">/ 12 repos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Badcase 增量</div>
+                    <div class="stat-value" style="color:var(--red);">+27</div>
+                    <div class="stat-delta down">140 → 167 (total 500)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均 Trace Steps</div>
+                    <div class="stat-value" style="color:var(--red);">+31%</div>
+                    <div class="stat-delta down">8.2 → 10.7 steps/task</div>
+                </div>
+            </div>
+
+            <!-- Category breakdown table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📊 按 Repo 精度对比</h3>
+                    <div class="tabs-row" style="margin-left:auto;">
+                        <div class="tab active">Resolved Rate</div>
+                        <div class="tab">Avg Steps</div>
+                        <div class="tab">Cache Hit</div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Repository</th>
+                            <th>v0.5.2</th>
+                            <th>v0.6.1</th>
+                            <th>Δ</th>
+                            <th>趋势</th>
+                            <th>Badcase Δ</th>
+                            <th>风险等级</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight:600;">django/django</td>
+                            <td>38.7%</td>
+                            <td style="color:var(--red);font-weight:700;">26.3%</td>
+                            <td><span class="delta-badge red">-12.4%</span></td>
+                            <td><span class="delta-bar red" style="width:50px;"></span></td>
+                            <td style="color:var(--red);">+15</td>
+                            <td><span class="regression-flag critical">🔴 严重</span></td>
+                            <td><span style="color:var(--accent);cursor:pointer;font-size:11px;">查看归因 →</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">pytest-dev/pytest</td>
+                            <td>29.4%</td>
+                            <td style="color:var(--red);font-weight:700;">21.1%</td>
+                            <td><span class="delta-badge red">-8.3%</span></td>
+                            <td><span class="delta-bar red" style="width:33px;"></span></td>
+                            <td style="color:var(--red);">+8</td>
+                            <td><span class="regression-flag critical">🔴 严重</span></td>
+                            <td><span style="color:var(--accent);cursor:pointer;font-size:11px;">查看归因 →</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">scikit-learn/scikit-learn</td>
+                            <td>24.6%</td>
+                            <td style="color:var(--yellow);">19.8%</td>
+                            <td><span class="delta-badge red">-4.8%</span></td>
+                            <td><span class="delta-bar red" style="width:19px;"></span></td>
+                            <td style="color:var(--yellow);">+5</td>
+                            <td><span class="regression-flag warning">🟡 关注</span></td>
+                            <td><span style="color:var(--accent);cursor:pointer;font-size:11px;">查看归因 →</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">sympy/sympy</td>
+                            <td>33.2%</td>
+                            <td style="color:var(--yellow);">28.7%</td>
+                            <td><span class="delta-badge red">-4.5%</span></td>
+                            <td><span class="delta-bar red" style="width:18px;"></span></td>
+                            <td style="color:var(--yellow);">+4</td>
+                            <td><span class="regression-flag warning">🟡 关注</span></td>
+                            <td><span style="color:var(--accent);cursor:pointer;font-size:11px;">查看归因 →</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">matplotlib/matplotlib</td>
+                            <td>28.1%</td>
+                            <td style="color:var(--yellow);">25.9%</td>
+                            <td><span class="delta-badge neutral">-2.2%</span></td>
+                            <td><span class="delta-bar red" style="width:9px;"></span></td>
+                            <td style="color:var(--yellow);">+2</td>
+                            <td><span class="regression-flag warning">🟡 关注</span></td>
+                            <td><span style="color:var(--accent);cursor:pointer;font-size:11px;">查看归因 →</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">psf/requests</td>
+                            <td>45.8%</td>
+                            <td>44.2%</td>
+                            <td><span class="delta-badge neutral">-1.6%</span></td>
+                            <td><span class="delta-bar neutral" style="width:6px;background:var(--text2);"></span></td>
+                            <td>+0</td>
+                            <td><span class="regression-flag ok">🟢 正常</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">astropy/astropy</td>
+                            <td>22.3%</td>
+                            <td>23.1%</td>
+                            <td><span class="delta-badge green">+0.8%</span></td>
+                            <td><span class="delta-bar green" style="width:3px;"></span></td>
+                            <td style="color:var(--green);">-1</td>
+                            <td><span class="regression-flag ok">🟢 正常</span></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Charts row -->
+            <div class="two-col">
+                <div class="chart-box">
+                    <h3>📊 Per-Repo Resolved Rate 对比</h3>
+                    <div style="display:flex;align-items:flex-end;gap:10px;height:150px;padding:0 4px;">
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">38.7</div>
+                            <div style="width:60%;height:93px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:63px;background:var(--red);border-radius:4px 4px 0 0;margin-top:-63px;opacity:0.85;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">django</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">29.4</div>
+                            <div style="width:60%;height:71px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:51px;background:var(--red);border-radius:4px 4px 0 0;margin-top:-51px;opacity:0.85;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">pytest</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">24.6</div>
+                            <div style="width:60%;height:59px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:48px;background:var(--yellow);border-radius:4px 4px 0 0;margin-top:-48px;opacity:0.85;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">sklearn</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">33.2</div>
+                            <div style="width:60%;height:80px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:69px;background:var(--yellow);border-radius:4px 4px 0 0;margin-top:-69px;opacity:0.85;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">sympy</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">28.1</div>
+                            <div style="width:60%;height:67px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:62px;background:var(--yellow);border-radius:4px 4px 0 0;margin-top:-62px;opacity:0.85;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">matplotlib</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">45.8</div>
+                            <div style="width:60%;height:110px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:106px;background:var(--accent);border-radius:4px 4px 0 0;margin-top:-106px;opacity:0.4;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">requests</div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;">
+                            <div style="font-size:9px;font-weight:600;white-space:nowrap;">22.3</div>
+                            <div style="width:60%;height:54px;background:var(--accent);border-radius:4px 4px 0 0;"></div>
+                            <div style="width:60%;height:55px;background:var(--green);border-radius:4px 4px 0 0;margin-top:-55px;opacity:0.85;"></div>
+                            <div style="font-size:9px;color:var(--text2);margin-top:4px;">astropy</div>
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <span><span class="legend-dot" style="background:var(--accent);"></span>v0.5.2 (Baseline)</span>
+                        <span><span class="legend-dot" style="background:var(--red);"></span>v0.6.1 (Target)</span>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <h3>📈 指标变化热力图</h3>
+                    <table style="font-size:11px;">
+                        <thead>
+                            <tr><th>指标</th><th>v0.5.2</th><th>v0.6.1</th><th>Δ</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight:600;">Avg Steps/Task</td><td>8.2</td><td style="color:var(--red);">10.7</td><td><span class="delta-badge red">+30.5%</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600;">KV Cache Hit</td><td>65%</td><td style="color:var(--red);">38%</td><td><span class="delta-badge red">-41.5%</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600;">Preemptions/Run</td><td>156</td><td style="color:var(--red);">498</td><td><span class="delta-badge red">+219%</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600;">Decode ms/token</td><td>15.8</td><td style="color:var(--yellow);">22.1</td><td><span class="delta-badge red">+39.9%</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600;">Tool Call Latency</td><td>420ms</td><td style="color:var(--yellow);">580ms</td><td><span class="delta-badge red">+38.1%</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600;">P99 E2E Latency</td><td>34.2s</td><td style="color:var(--yellow);">52.8s</td><td><span class="delta-badge red">+54.4%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Insights -->
+            <div class="insight-box">
+                <h3>💡 Diff 分析摘要</h3>
+                <ul class="insight-list">
+                    <li><strong>django/django (-12.4%)</strong> 是 resolved rate 回退最严重的 repo。28 个任务中仅 8 个被正确修复。归因引擎指向 <strong>Agent 搜索确认循环</strong>——平均 steps/task 从 8.2 增至 10.7，冗余工具调用增加了 31%。</li>
+                    <li><strong>pytest-dev/pytest (-8.3%)</strong> 新增 badcase 中 70% 为"文件定位错误"类型：Agent 在 grep/shell 搜索后定位到错误的源文件，可能与长上下文下 KV cache 命中率下降导致上下文断裂有关。</li>
+                    <li><strong>整体性能严重退化</strong>：P99 端到端延迟从 34s 增至 53s (+54%)，preemption 次数从 156 增至 498 (+219%)。Agent 的每次 LLM 调用都会触发 decode，preemption 增多意味着 Agent 的多步推理链路频繁被打断、上下文被逐出。</li>
+                    <li><strong>正面变化</strong>：astropy/astropy (+0.8%) 和 requests (-1.6%) 表现稳定，说明回退并非全局性——大型 repo（django, pytest）受影响更大，可能与 repo 规模导致的文件搜索步骤增加产生复合效应有关。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

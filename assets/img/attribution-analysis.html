@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>归因分析 - vLLM 可观测平台</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #181b24;
+            --surface2: #1e2130;
+            --border: #2a2d3a;
+            --text: #e1e4ea;
+            --text2: #8b8fa7;
+            --accent: #6c8cff;
+            --green: #4ade80;
+            --red: #f87171;
+            --yellow: #fbbf24;
+            --orange: #fb923c;
+            --purple: #a78bfa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; }
+
+        /* Sidebar */
+        .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { padding: 0 20px 20px; font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+        .nav-item { padding: 10px 20px; display: flex; align-items: center; gap: 10px; color: var(--text2); cursor: pointer; font-size: 13px; transition: all 0.15s; }
+        .nav-item:hover { color: var(--text); background: var(--surface2); }
+        .nav-item.active { color: var(--accent); background: var(--surface2); border-right: 2px solid var(--accent); }
+        .nav-icon { width: 18px; text-align: center; }
+
+        /* Main */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-run { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+        .tb-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 12px; }
+
+        /* Content */
+        .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* Cards */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+        .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+        .card-header .sub { font-size: 11px; color: var(--text2); }
+
+        /* Stat row */
+        .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+        .stat-card .stat-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+        .stat-card .stat-value { font-size: 24px; font-weight: 700; }
+        .stat-card .stat-delta { font-size: 11px; margin-top: 4px; }
+        .stat-card .stat-delta.down { color: var(--red); }
+        .stat-card .stat-delta.up { color: var(--green); }
+
+        /* Compare table */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .compare-table th { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+        .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+        .compare-table tr:hover td { background: var(--surface2); }
+        .sig-high { color: var(--red); font-weight: 700; }
+        .sig-low { color: var(--green); }
+        .sig-none { color: var(--text2); }
+        .effect-bar { height: 6px; background: var(--border); border-radius: 3px; min-width: 80px; overflow: hidden; }
+        .effect-bar-fill { height: 100%; border-radius: 3px; }
+        .effect-bar-fill.high { background: var(--red); }
+        .effect-bar-fill.mid { background: var(--orange); }
+        .effect-bar-fill.low { background: var(--text2); }
+
+        /* Decision tree */
+        .tree { font-family: "JetBrains Mono", "Fira Code", monospace; font-size: 12px; line-height: 1.8; }
+        .tree-branch { margin-left: 24px; position: relative; }
+        .tree-branch::before { content: '├─ '; color: var(--text2); }
+        .tree-branch:last-child::before { content: '└─ '; }
+        .tree-cond { color: var(--yellow); }
+        .tree-result { color: var(--red); font-weight: 700; }
+        .tree-result.ok { color: var(--green); }
+        .tree-label { color: var(--text2); font-size: 11px; margin-left: 8px; }
+
+        /* Conclusion box */
+        .conclusion-box { background: linear-gradient(135deg, rgba(108,140,255,0.06), rgba(167,139,250,0.06)); border: 1px solid rgba(108,140,255,0.2); border-radius: 10px; padding: 20px; }
+        .conclusion-box h3 { font-size: 14px; color: var(--accent); margin-bottom: 12px; }
+        .conclusion-box .module-tag { display: inline-block; padding: 3px 10px; background: rgba(108,140,255,0.15); color: var(--accent); border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 6px; }
+        .conclusion-text { font-size: 13px; line-height: 1.7; color: var(--text); }
+
+        /* Suggestion list */
+        .suggestion-list { list-style: none; padding: 0; }
+        .suggestion-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+        .suggestion-list li:last-child { border-bottom: none; }
+        .sug-num { width: 20px; height: 20px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+
+        /* Chart placeholder */
+        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .chart-box { background: var(--surface2); border: 1px dashed var(--border); border-radius: 8px; height: 180px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
+        .chart-box .icon { font-size: 28px; }
+        .chart-box .label { font-size: 11px; color: var(--text2); }
+        .chart-box .desc { font-size: 10px; color: var(--text2); }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 3px; }
+        .tab { padding: 6px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+        .tab.active { background: var(--bg); color: var(--text); font-weight: 600; }
+
+        /* Badges */
+        .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .badge-warn { background: rgba(251,191,36,0.12); color: var(--yellow); }
+        .badge-red { background: rgba(248,113,113,0.12); color: var(--red); }
+        .badge-green { background: rgba(74,222,128,0.12); color: var(--green); }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">⚡ vLLM Observatory</div>
+        <div class="sidebar-nav" style="display:flex;flex-direction:column;">
+            <div class="nav-item"><span class="nav-icon">📊</span>评测概览</div>
+            <div class="nav-item"><span class="nav-icon">🔍</span>Badcase 管理</div>
+            <div class="nav-item"><span class="nav-icon">📈</span>Benchmark Diff</div>
+            <div class="nav-item active"><span class="nav-icon">🎯</span>归因分析</div>
+            <div class="nav-item"><span class="nav-icon">📋</span>归因报告</div>
+            <div class="nav-item"><span class="nav-icon">⚙️</span>设置</div>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <span class="topbar-title">归因分析</span>
+            <div class="topbar-run">
+                <span style="font-size:12px;color:var(--text2)">Run:</span>
+                <select class="tb-select" style="margin-right:4px">
+                    <option>mmlu-20260805-vllm-0.6.1</option>
+                </select>
+                <span style="font-size:12px;color:var(--text2)">Cluster:</span>
+                <select class="tb-select">
+                    <option>Cluster 2: 计算题中间步骤出错 (23)</option>
+                    <option>Cluster 1: 解剖学相似结构混淆 (18)</option>
+                    <option>Cluster 3: 选项理解偏差 (15)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Overview stats -->
+            <div class="stat-row">
+                <div class="stat-card">
+                    <div class="stat-label">选定 Cluster Badcase 数</div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-delta down">占全部 badcase 的 19.2%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Trace 关联成功率</div>
+                    <div class="stat-value" style="color:var(--green)">91%</div>
+                    <div class="stat-delta up">21/23 已绑定</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">同类目正确 Case（对照组）</div>
+                    <div class="stat-value">87</div>
+                    <div class="stat-delta" style="color:var(--text2)">mathematics 类目</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">关联精度</div>
+                    <div class="stat-value" style="color:var(--accent)">Level 2</div>
+                    <div class="stat-delta" style="color:var(--text2)">多条件 fuzzy join</div>
+                </div>
+            </div>
+
+            <!-- Metric comparison table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📊 指标对比分析</h3>
+                    <span class="sub">Badcase 组 vs 正确 Case 组（Mann-Whitney U 检验）</span>
+                    <span class="badge badge-warn" style="margin-left:auto">p < 0.05 显著</span>
+                </div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>指标</th>
+                            <th>Badcase 均值</th>
+                            <th>正确 Case 均值</th>
+                            <th>差异 (%)</th>
+                            <th>p 值</th>
+                            <th>效应量 (Cohen's d)</th>
+                            <th>效应量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight:600;">kv_cache_hit_rate</td>
+                            <td class="sig-high">0.31</td>
+                            <td>0.67</td>
+                            <td class="sig-high">-53.7%</td>
+                            <td class="sig-high">< 0.001</td>
+                            <td class="sig-high">0.78</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill high" style="width:78%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">num_preemptions</td>
+                            <td class="sig-high">3.2</td>
+                            <td>0.8</td>
+                            <td class="sig-high">+300%</td>
+                            <td class="sig-high">< 0.001</td>
+                            <td class="sig-high">0.65</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill high" style="width:65%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">decode_ms_per_token</td>
+                            <td class="sig-high">18.3</td>
+                            <td>11.2</td>
+                            <td class="sig-high">+63.4%</td>
+                            <td class="sig-high">< 0.001</td>
+                            <td>0.52</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill mid" style="width:52%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">batch_size_at_inference</td>
+                            <td>14.2</td>
+                            <td>13.8</td>
+                            <td>+2.9%</td>
+                            <td class="sig-none">0.312</td>
+                            <td class="sig-none">0.08</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill low" style="width:8%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">ttft_ms</td>
+                            <td>234</td>
+                            <td>220</td>
+                            <td>+6.4%</td>
+                            <td class="sig-none">0.320</td>
+                            <td class="sig-none">0.08</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill low" style="width:8%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">prompt_tokens</td>
+                            <td>156</td>
+                            <td>148</td>
+                            <td>+5.4%</td>
+                            <td class="sig-none">0.245</td>
+                            <td class="sig-none">0.06</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill low" style="width:6%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">completion_tokens</td>
+                            <td>89</td>
+                            <td>82</td>
+                            <td>+8.5%</td>
+                            <td>0.041</td>
+                            <td>0.18</td>
+                            <td><div class="effect-bar"><div class="effect-bar-fill low" style="width:18%"></div></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Decision Tree + Visualization -->
+            <div class="chart-row">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🌲 决策树定界</h3>
+                        <span class="sub">多因素交互分析（max_depth=3）</span>
+                    </div>
+                    <div class="tree">
+                        <div><span class="tree-cond">kv_cache_hit_rate ≤ 0.35</span> <span class="tree-label">(n=110)</span></div>
+                        <div class="tree-branch">
+                            <span style="color:var(--accent);font-weight:700;">YES →</span>
+                            <span class="tree-cond">preemptions > 2</span> <span class="tree-label">(n=38)</span>
+                        </div>
+                        <div class="tree-branch" style="margin-left:48px">
+                            <span style="color:var(--accent);font-weight:700;">YES →</span>
+                            <span class="tree-result">错误率 89%</span> <span class="tree-label">⚠ 高风险分支 (n=18)</span>
+                        </div>
+                        <div class="tree-branch" style="margin-left:48px">
+                            <span style="color:var(--text2);">NO →</span>
+                            <span class="tree-result ok">错误率 42%</span> <span class="tree-label">(n=20)</span>
+                        </div>
+                        <div class="tree-branch">
+                            <span style="color:var(--text2);">NO →</span>
+                            <span class="tree-cond">decode_ms_per_token > 15</span> <span class="tree-label">(n=72)</span>
+                        </div>
+                        <div class="tree-branch" style="margin-left:48px">
+                            <span style="color:var(--accent);font-weight:700;">YES →</span>
+                            <span class="tree-result ok">错误率 31%</span> <span class="tree-label">(n=28)</span>
+                        </div>
+                        <div class="tree-branch" style="margin-left:48px">
+                            <span style="color:var(--text2);">NO →</span>
+                            <span class="tree-result ok">错误率 12%</span> <span class="tree-label">✅ 正常范围 (n=44)</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);">
+                        <strong>解读：</strong>当 <span style="color:var(--yellow);">kv_cache_hit ≤ 0.35</span> 且 <span style="color:var(--yellow);">preemptions > 2</span> 时，错误率从基线的 12% 跃升至 89%。这两个因素的交互效应是单一因素无法解释的。
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📈 关键指标分布对比</h3>
+                        <span class="sub">Badcase vs 正确 Case</span>
+                    </div>
+                    <div class="chart-box">
+                        <div class="icon">📊</div>
+                        <div class="label">KV Cache 命中率分布</div>
+                        <div class="desc">Badcase: μ=0.31 | 正确: μ=0.67 | p<0.001</div>
+                    </div>
+                    <div class="chart-box" style="margin-top:8px;height:120px;">
+                        <div class="icon">📉</div>
+                        <div class="label">Preemption 次数分布</div>
+                        <div class="desc">Badcase: μ=3.2 | 正确: μ=0.8 | p<0.001</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Root cause conclusion -->
+            <div class="conclusion-box">
+                <h3>🎯 定界结论</h3>
+                <div style="margin-bottom:12px;">
+                    <span class="module-tag">推理调度模块</span>
+                    <span class="module-tag">Prefix Caching</span>
+                    <span class="module-tag">KV Cache 策略</span>
+                </div>
+                <div class="conclusion-text">
+                    <p style="margin-bottom:12px;">
+                        该 Cluster（计算题中间步骤出错，23 cases）的 badcase 表现出持续且显著的 <strong>KV cache 低命中率</strong>（0.31 vs 正常 0.67）和 <strong>高 preemption 率</strong>（3.2 次 vs 正常 0.8 次）。
+                    </p>
+                    <p style="margin-bottom:12px;">
+                        计算类题目的 prompt 模式（长上下文、多步推理、中间计算步骤作为上下文依赖）与当前 prefix caching 的 <strong>eviction 策略不匹配</strong>。中间推理步骤的 KV cache 被过早逐出，导致后续步骤无法命中缓存，每次 decode 都需要重新计算前缀 → token 级 decode 耗时从 11.2ms 跃升至 18.3ms（+63%）→ 多步推理链因延迟累积而断裂或出错。
+                    </p>
+                    <p>
+                        该问题<strong>可能</strong>与 vLLM 从 0.5.2 升级到 0.6.1 时 prefix caching 策略的变更相关。建议对比 0.5.2 同类工作负载的 KV cache 指标以确认是否为版本回归。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Optimization suggestions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>💡 优化建议</h3>
+                    <span class="sub">基于归因结果</span>
+                    <div style="margin-left:auto;display:flex;gap:6px;">
+                        <span class="badge badge-red" style="font-size:10px;">高优先级 ×2</span>
+                        <span class="badge badge-warn" style="font-size:10px;">中优先级 ×1</span>
+                    </div>
+                </div>
+                <ul class="suggestion-list">
+                    <li>
+                        <span class="sug-num" style="background:rgba(248,113,113,0.15);color:var(--red);">1</span>
+                        <div>
+                            <strong>调优 prefix caching 的 eviction 策略</strong>
+                            <div style="color:var(--text2);margin-top:2px;">针对数学推理类工作负载的长上下文依赖特征，提高 prefix caching 的 TTL 或启用 sliding window eviction，避免中间推理步骤的 KV cache 过早逐出。建议调参方向：<code style="background:var(--surface2);padding:1px 4px;border-radius:2px;">--max-model-len</code> 和 <code style="background:var(--surface2);padding:1px 4px;border-radius:2px;">--gpu-memory-utilization</code>。</div>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="sug-num" style="background:rgba(248,113,113,0.15);color:var(--red);">2</span>
+                        <div>
+                            <strong>对比 vLLM 0.5.2 的同类指标，确认为版本回归</strong>
+                            <div style="color:var(--text2);margin-top:2px;">在当前归因分析面板中选择 vLLM 0.5.2 对应 MMLU 数学类目的历史 run，对比 KV cache 命中率和 preemption 次数的变化趋势。如果 0.5.2 中无此异常，定位引入回归的 commit。</div>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="sug-num">3</span>
+                        <div>
+                            <strong>增加 KV cache 预算或启用 offload</strong>
+                            <div style="color:var(--text2);margin-top:2px;">如果 GPU 内存允许，增加 KV cache 的 GPU 预算；否则考虑启用 CPU offload（<code style="background:var(--surface2);padding:1px 4px;border-radius:2px;">--cpu-offload-gb</code>）来扩展有效缓存容量，降低 eviction 频率。</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Benchmark version diff -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📈 vLLM 版本间指标趋势</h3>
+                    <span class="sub">同 Benchmark（MMLU mathematics）</span>
+                    <div class="tabs" style="margin-left:auto;">
+                        <div class="tab active">KV Cache 命中率</div>
+                        <div class="tab">Preemptions</div>
+                        <div class="tab">Accuracy</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                    <div class="chart-box" style="height:140px;">
+                        <div style="font-size:11px;font-weight:600;margin-bottom:4px;">vLLM 0.5.2</div>
+                        <div style="font-size:28px;color:var(--green);font-weight:700;">0.72</div>
+                        <div style="font-size:11px;color:var(--text2);">KV Cache Hit Rate</div>
+                    </div>
+                    <div class="chart-box" style="height:140px;border-color:var(--red);border-style:solid;">
+                        <div style="font-size:11px;font-weight:600;margin-bottom:4px;">vLLM 0.6.1</div>
+                        <div style="font-size:28px;color:var(--red);font-weight:700;">0.31</div>
+                        <div style="font-size:11px;color:var(--text2);">KV Cache Hit Rate</div>
+                    </div>
+                    <div class="chart-box" style="height:140px;">
+                        <div style="font-size:11px;font-weight:600;margin-bottom:4px;">变化</div>
+                        <div style="font-size:28px;color:var(--red);font-weight:700;">-56.9%</div>
+                        <div style="font-size:11px;color:var(--text2);">⚠ 显著退化</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

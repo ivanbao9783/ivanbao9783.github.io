@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badcase 管理 - vLLM 可观测平台</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #181b24;
+            --surface2: #1e2130;
+            --border: #2a2d3a;
+            --text: #e1e4ea;
+            --text2: #8b8fa7;
+            --accent: #6c8cff;
+            --green: #4ade80;
+            --red: #f87171;
+            --yellow: #fbbf24;
+            --orange: #fb923c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { padding: 0 20px 20px; font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+        .sidebar-nav { flex: 1; }
+        .nav-item { padding: 10px 20px; display: flex; align-items: center; gap: 10px; color: var(--text2); cursor: pointer; font-size: 13px; transition: all 0.15s; }
+        .nav-item:hover { color: var(--text); background: var(--surface2); }
+        .nav-item.active { color: var(--accent); background: var(--surface2); border-right: 2px solid var(--accent); }
+        .nav-icon { width: 18px; text-align: center; }
+
+        /* Main */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Top bar */
+        .topbar { height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-run { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+        .tb-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 12px; }
+        .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .badge-pass { background: rgba(74,222,128,0.12); color: var(--green); }
+        .badge-fail { background: rgba(248,113,113,0.12); color: var(--red); }
+
+        /* Content area */
+        .content { flex: 1; display: flex; overflow: hidden; }
+        
+        /* Left panel - list */
+        .panel-left { width: 420px; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .panel-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .panel-header .tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 3px; }
+        .panel-header .tab { padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+        .panel-header .tab.active { background: var(--bg); color: var(--text); font-weight: 600; }
+        .search-box { flex: 1; margin-left: 8px; }
+        .search-box input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: var(--text); font-size: 12px; }
+        
+        /* Sample list */
+        .sample-list { flex: 1; overflow-y: auto; }
+        .sample-row { padding: 12px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.12s; display: flex; align-items: flex-start; gap: 10px; }
+        .sample-row:hover { background: var(--surface2); }
+        .sample-row.active { background: var(--surface2); border-left: 3px solid var(--accent); }
+        .sample-score { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+        .sample-score.pass { background: rgba(74,222,128,0.15); color: var(--green); }
+        .sample-score.fail { background: rgba(248,113,113,0.15); color: var(--red); }
+        .sample-info { flex: 1; min-width: 0; }
+        .sample-id { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+        .sample-meta { font-size: 11px; color: var(--text2); display: flex; gap: 12px; }
+        .sample-cat { font-size: 10px; padding: 2px 6px; border-radius: 3px; background: var(--surface2); color: var(--text2); }
+        .sample-preview { font-size: 11px; color: var(--text2); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+        .sample-trace { font-size: 10px; color: var(--accent); margin-top: 2px; }
+
+        /* Right panel - detail */
+        .panel-right { flex: 1; overflow-y: auto; padding: 24px; }
+        .detail-header { margin-bottom: 20px; }
+        .detail-header h3 { font-size: 16px; margin-bottom: 6px; }
+        .detail-meta { font-size: 12px; color: var(--text2); display: flex; gap: 20px; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { font-size: 12px; text-transform: uppercase; color: var(--text2); letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
+        .code-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-size: 12px; line-height: 1.6; font-family: "JetBrains Mono", "Fira Code", monospace; white-space: pre-wrap; word-break: break-word; }
+        .code-block.diff { border-left: 3px solid var(--red); }
+        .code-block.pass { border-left: 3px solid var(--green); }
+
+        /* Trace info card */
+        .trace-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+        .trace-metric { text-align: center; }
+        .trace-metric .val { font-size: 18px; font-weight: 700; color: var(--accent); }
+        .trace-metric .label { font-size: 10px; color: var(--text2); margin-top: 2px; }
+        .trace-link { font-size: 12px; color: var(--accent); cursor: pointer; margin-top: 10px; display: block; }
+
+        /* Agent trajectory timeline */
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+        .tl-step { position: relative; margin-bottom: 16px; }
+        .tl-step::before { content: ''; position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--border); border: 2px solid var(--surface2); }
+        .tl-step.llm::before { background: var(--accent); }
+        .tl-step.tool::before { background: var(--orange); }
+        .tl-step.obs::before { background: var(--yellow); }
+        .tl-step.error::before { background: var(--red); }
+        .tl-step .tl-type { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .tl-step.llm .tl-type { color: var(--accent); }
+        .tl-step.tool .tl-type { color: var(--orange); }
+        .tl-step.obs .tl-type { color: var(--yellow); }
+        .tl-step.error .tl-type { color: var(--red); }
+        .tl-step .tl-time { font-size: 10px; color: var(--text2); margin-left: 6px; }
+        .tl-content { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-size: 11px; line-height: 1.5; }
+        .tl-content summary { cursor: pointer; font-weight: 600; font-size: 11px; }
+        .tl-content .io { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+        .tl-content .io-label { font-size: 10px; color: var(--text2); margin-bottom: 3px; }
+        .tl-content .io-val { font-size: 10px; font-family: "JetBrains Mono", "Fira Code", monospace; color: var(--text2); word-break: break-all; }
+
+        /* Classification clusters */
+        .cluster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
+        .cluster-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.15s; }
+        .cluster-card:hover { border-color: var(--accent); }
+        .cluster-card.active { border-color: var(--accent); background: rgba(108,140,255,0.05); }
+        .cluster-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .cluster-count { font-size: 11px; color: var(--text2); margin-bottom: 8px; }
+        .cluster-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
+        .cluster-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+        .cluster-snippet { font-size: 10px; color: var(--text2); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Status dots */
+        .link-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+        .link-dot.on { background: var(--green); }
+        .link-dot.off { background: var(--text2); }
+
+        /* Pagination */
+        .pagination { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text2); flex-shrink: 0; }
+        .pagination .page-btn { padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; background: var(--surface2); color: var(--text2); font-size: 11px; }
+        .pagination .page-btn:hover { color: var(--text); border-color: var(--accent); }
+        .pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .page-btns { display: flex; gap: 4px; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">⚡ vLLM Observatory</div>
+        <div class="sidebar-nav">
+            <div class="nav-item"><span class="nav-icon">📊</span>评测概览</div>
+            <div class="nav-item active"><span class="nav-icon">🔍</span>Badcase 管理</div>
+            <div class="nav-item"><span class="nav-icon">📈</span>Benchmark Diff</div>
+            <div class="nav-item"><span class="nav-icon">🎯</span>归因分析</div>
+            <div class="nav-item"><span class="nav-icon">⚙️</span>设置</div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+        <div class="topbar">
+            <span class="topbar-title">Badcase 管理</span>
+            <div class="topbar-run">
+                <span style="font-size:12px; color:var(--text2)">当前 Run:</span>
+                <select class="tb-select" id="runSelect">
+                    <option value="mmlu-20260805-vllm-0.6.1">mmlu-20260805-vllm-0.6.1</option>
+                    <option value="gsm8k-20260803-vllm-0.6.0">gsm8k-20260803-vllm-0.6.0</option>
+                    <option value="swe-bench-20260801-vllm-0.5.2">swe-bench-20260801-vllm-0.5.2</option>
+                </select>
+                <span class="badge badge-fail" id="accuracyBadge">accuracy 88%</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Left: sample list -->
+            <div class="panel-left">
+                <div class="panel-header">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('all')">全部 (<span id="totalBadge">5</span>)</div>
+                        <div class="tab" onclick="switchTab('cluster')">分类视图</div>
+                        <div class="tab" onclick="switchTab('agent')">Agent</div>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" placeholder="搜索 sample_id / 关键词...">
+                    </div>
+                </div>
+                <div class="sample-list" id="sampleList">
+                    <!-- Generated by JS -->
+                </div>
+                <div class="pagination">
+                    <span id="pageInfo">第 1/1 页，共 5 条</span>
+                    <div class="page-btns">
+                        <span class="page-btn active">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: detail view -->
+            <div class="panel-right" id="detailPanel">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ======================== DATA ========================
+    const runs = {
+        'mmlu-20260805-vllm-0.6.1': {
+            accuracy: '88%', accuracyClass: 'badge-fail',
+            samples: [
+                {
+                    id: 'mmlu_math_0083', cat: 'mathematics', catColor: '#6c8cff', score: 0, trace: 'abc123def', traceOn: true,
+                    preview: 'Prediction: "The derivative at x=2 is 11" — 缺少符号步骤',
+                    prompt: 'Calculate the derivative of f(x) = x³ + x² - 5x + 3 at x = 2. Show your work.',
+                    prediction: `f'(x) = 3x² + 2x - 5\nf'(2) = 3(4) + 2(2) - 5 = 12 + 4 - 5 = 11\nThe answer is 11.`,
+                    groundTruth: `f'(x) = 3x² + 2x - 5\nf'(2) = 12 + 4 - 5 = 11`,
+                    matchNote: '⚠ 结果数值一致但中间步骤书写形式不同，评分器判定为格式不匹配',
+                    metrics: { ttft: '234ms', kvCache: '31%', kvCacheBad: true, preemptions: '3', preemptionsBad: true, decode: '856ms', tokens: '89' },
+                    cluster: { name: 'Cluster 2: 计算题中间步骤出错', count: 18, desc: '该类 badcase 的特征：KV cache 命中率低 + preemption 频繁 → decode 阶段耗时异常 → 多步推理中间状态丢失' }
+                },
+                {
+                    id: 'mmlu_anatomy_0012', cat: 'anatomy', catColor: '#4ade80', score: 0, trace: 'def456abc', traceOn: true,
+                    preview: '"The biceps brachii..." vs "The brachialis..." — 解剖学名称混淆',
+                    prompt: 'Which muscle is primarily responsible for flexion of the elbow joint?',
+                    prediction: 'The biceps brachii is primarily responsible for elbow flexion.',
+                    groundTruth: 'The brachialis is the primary flexor of the elbow joint. The biceps brachii assists but is not the primary muscle.',
+                    matchNote: '⚠ 模型混淆了主要屈肌（brachialis）和辅助屈肌（biceps brachii）',
+                    metrics: { ttft: '198ms', kvCache: '45%', kvCacheBad: false, preemptions: '1', preemptionsBad: false, decode: '412ms', tokens: '56' },
+                    cluster: { name: 'Cluster 1: 解剖学相似结构混淆', count: 15, desc: '模型在相似解剖学概念之间产生混淆，偏向高频但错误的答案' }
+                },
+                {
+                    id: 'mmlu_law_0045', cat: 'law', catColor: '#fbbf24', score: 0, trace: 'ghi789jkl', traceOn: true,
+                    preview: '输出格式不符合预期 JSON schema — 格式错误',
+                    prompt: 'List the three elements of a valid contract under common law, in JSON format.',
+                    prediction: 'The three elements are: 1. Offer 2. Acceptance 3. Consideration',
+                    groundTruth: '{"elements": ["offer", "acceptance", "consideration"]}',
+                    matchNote: '⚠ 答案内容正确，但未按要求以 JSON 格式输出，被判定为格式错误',
+                    metrics: { ttft: '210ms', kvCache: '62%', kvCacheBad: false, preemptions: '0', preemptionsBad: false, decode: '380ms', tokens: '42' },
+                    cluster: { name: 'Cluster 3: 输出格式不匹配', count: 12, desc: '模型输出了正确内容但未遵循指定的输出格式（JSON/Markdown/选项字母等）' }
+                },
+                {
+                    id: 'mmlu_physics_0019', cat: 'physics', catColor: '#fb923c', score: 0, trace: '', traceOn: false,
+                    preview: '单位换算错误：混淆了焦耳和电子伏特',
+                    prompt: 'Calculate the energy of a photon with wavelength 500 nm. Express in eV.',
+                    prediction: 'E = hc/λ = (6.63e-34)(3e8)/(500e-9) = 3.98e-19 J\nThe energy is 3.98e-19 eV.',
+                    groundTruth: 'E = hc/λ = 3.98e-19 J = 2.48 eV (using 1 eV = 1.602e-19 J)',
+                    matchNote: '⚠ 模型正确计算了焦耳值，但未进行单位转换（J → eV），直接将焦耳值标为 eV',
+                    metrics: null,
+                    cluster: { name: 'Cluster 4: 单位/量纲错误', count: 7, desc: '计算结果数值正确但单位或量纲不一致' }
+                },
+                {
+                    id: 'mmlu_cs_0072', cat: 'computer_science', catColor: '#a78bfa', score: 0, trace: '', traceOn: false,
+                    preview: '算法复杂度分析错误 O(n²) vs O(n log n)',
+                    prompt: 'What is the time complexity of merge sort in the average case?',
+                    prediction: 'Merge sort has a time complexity of O(n²) in the average case due to the divide-and-conquer approach.',
+                    groundTruth: 'O(n log n) — merge sort divides the array in half at each step (log n levels) and merges n elements at each level.',
+                    matchNote: '⚠ 模型错误地将 merge sort 复杂度判定为 O(n²)，可能是与 bubble/insertion sort 混淆',
+                    metrics: null,
+                    cluster: { name: 'Cluster 2: 计算题中间步骤出错', count: 18, desc: '该类 badcase 的特征：KV cache 命中率低 + preemption 频繁 → decode 阶段耗时异常 → 多步推理中间状态丢失' }
+                }
+            ]
+        },
+        'gsm8k-20260803-vllm-0.6.0': {
+            accuracy: '91%', accuracyClass: 'badge-fail',
+            samples: [
+                {
+                    id: 'gsm8k_0234', cat: 'math_arithmetic', catColor: '#6c8cff', score: 0, trace: 'xyz111aaa', traceOn: true,
+                    preview: '多步算术：中间计算步骤数值抄错',
+                    prompt: 'Janet has 24 eggs. She uses 1/3 of them to make omelets and gives away 5 eggs. How many does she have left?',
+                    prediction: 'Janet uses 24/3 = 8 eggs for omelets. Then gives away 5. Total used = 8 + 5 = 13. Remaining = 24 - 13 = 11.',
+                    groundTruth: 'Janet uses 24/3 = 8 eggs. Remaining after omelets: 24 - 8 = 16. After giving away 5: 16 - 5 = 11.',
+                    matchNote: '⚠ 计算结果碰巧一致，但推理路径有冗余步骤',
+                    metrics: { ttft: '289ms', kvCache: '52%', kvCacheBad: false, preemptions: '1', preemptionsBad: false, decode: '720ms', tokens: '67' },
+                    cluster: { name: 'Cluster A: 算术推理路径冗余', count: 9, desc: '推理结果正确但路径不够精简，评分器对冗余步骤扣分' }
+                },
+                {
+                    id: 'gsm8k_0782', cat: 'math_word_problem', catColor: '#fb923c', score: 0, trace: 'xyz222bbb', traceOn: true,
+                    preview: '应用题理解偏差："each way" 被理解为单程而非往返',
+                    prompt: 'Tom walks 3 miles each way to school. If he goes to school and back 5 days a week, how many miles does he walk in a week?',
+                    prediction: '3 miles × 5 days = 15 miles per week.',
+                    groundTruth: 'Each round trip = 3 × 2 = 6 miles. 6 × 5 = 30 miles per week.',
+                    matchNote: '⚠ 模型忽略了"each way"意味着往返两段路程',
+                    metrics: { ttft: '156ms', kvCache: '71%', kvCacheBad: false, preemptions: '0', preemptionsBad: false, decode: '340ms', tokens: '35' },
+                    cluster: { name: 'Cluster B: 应用题语义理解偏差', count: 14, desc: '模型对关键语义短语（each way, remaining after, per person）理解有误' }
+                },
+                {
+                    id: 'gsm8k_0456', cat: 'math_fraction', catColor: '#4ade80', score: 0, trace: '', traceOn: false,
+                    preview: '分数运算错误：分母通分后分子计算遗漏',
+                    prompt: 'Sarah ate 2/5 of a pizza and John ate 1/3. What fraction of the pizza remains?',
+                    prediction: '2/5 + 1/3 = 3/8. Remaining = 1 - 3/8 = 5/8.',
+                    groundTruth: '2/5 + 1/3 = 6/15 + 5/15 = 11/15. Remaining = 4/15.',
+                    matchNote: '⚠ 通分错误，直接分子分母分别相加',
+                    metrics: null,
+                    cluster: { name: 'Cluster C: 分数运算错误', count: 6, desc: '分数通分/约分步骤出错' }
+                }
+            ]
+        },
+        'swe-bench-20260801-vllm-0.5.2': {
+            accuracy: '72%', accuracyClass: 'badge-fail',
+            samples: [
+                {
+                    id: 'swe_task_0103', cat: 'agent_swe', catColor: '#fbbf24', score: 0, trace: 'ag001(×8)', traceOn: true,
+                    preview: 'Agent 修复 bug：在错误文件中添加了补丁',
+                    prompt: 'Fix the null pointer exception in src/auth/login.py when user session expires.',
+                    prediction: 'Generated patch applied to src/auth/session.py instead of src/auth/login.py',
+                    groundTruth: 'Patch should add null check in login.py: if session is None: return 401',
+                    matchNote: '⚠ 模型定位到了正确的模块但错误的文件，Agent 轨迹中第 4 步 grep 返回了歧义结果',
+                    metrics: { ttft: '567ms', kvCache: '28%', kvCacheBad: true, preemptions: '5', preemptionsBad: true, decode: '2340ms', tokens: '312' },
+                    cluster: { name: 'SWE Cluster 1: 文件定位错误', count: 8, desc: 'Agent 在代码库中定位目标文件时出现歧义，搜索工具返回了误导性结果' },
+                    trajectory: true
+                },
+                {
+                    id: 'swe_task_0207', cat: 'agent_swe', catColor: '#fbbf24', score: 0, trace: 'ag002(×12)', traceOn: true,
+                    preview: 'Agent 修复：冗余工具调用导致超时',
+                    prompt: 'Add input validation to src/api/handlers.py to reject empty request bodies.',
+                    prediction: 'Agent ran 12 search iterations before timing out; partial fix submitted.',
+                    groundTruth: 'Add: if not request.body: raise HTTPException(status_code=400)',
+                    matchNote: '⚠ Agent 在找到正确文件后仍反复搜索确认，第 5-10 步为冗余操作，总耗时超限',
+                    metrics: { ttft: '890ms', kvCache: '19%', kvCacheBad: true, preemptions: '8', preemptionsBad: true, decode: '5200ms', tokens: '580' },
+                    cluster: { name: 'SWE Cluster 2: 搜索确认循环', count: 11, desc: 'Agent 找到目标后反复验证，产生大量冗余工具调用导致超时' },
+                    trajectory: true
+                },
+                {
+                    id: 'swe_task_0311', cat: 'agent_swe', catColor: '#fbbf24', score: 0, trace: '', traceOn: false,
+                    preview: 'Agent 修复：生成的补丁引入了新的语法错误',
+                    prompt: 'Refactor the database connection pool to use async/await in src/db/pool.py.',
+                    prediction: 'Generated async/await refactor but introduced syntax error at line 47 (missing await keyword).',
+                    groundTruth: 'Correct async refactor with proper await placement on all DB calls.',
+                    matchNote: '⚠ 模型生成的代码中有语法错误，一个 await 关键字遗漏导致代码无法运行',
+                    metrics: null,
+                    cluster: { name: 'SWE Cluster 3: 生成代码质量问题', count: 6, desc: 'Agent 生成的补丁包含语法错误、逻辑错误或边界条件遗漏' },
+                    trajectory: true
+                }
+            ]
+        }
+    };
+
+    let currentRun = 'mmlu-20260805-vllm-0.6.1';
+    let currentSample = null;
+
+    // ======================== RENDER ========================
+    function renderPage() {
+        const run = runs[currentRun];
+        // update topbar
+        document.getElementById('accuracyBadge').textContent = 'accuracy ' + run.accuracy;
+        document.getElementById('accuracyBadge').className = 'badge ' + run.accuracyClass;
+        document.getElementById('totalBadge').textContent = run.samples.length;
+        document.getElementById('pageInfo').textContent = '第 1/1 页，共 ' + run.samples.length + ' 条';
+
+        // pick first sample as active
+        if (!currentSample || !run.samples.find(s => s.id === currentSample.id)) {
+            currentSample = run.samples[0];
+        }
+
+        // render sample list
+        const list = document.getElementById('sampleList');
+        list.innerHTML = run.samples.map(s => {
+            const active = currentSample.id === s.id ? ' active' : '';
+            const traceHtml = s.traceOn 
+                ? '<span class="link-dot on"></span>vLLM trace 已关联' + (s.trace.includes('×') ? ' (' + s.trace.split('×')[1] + ' steps)' : '') 
+                : '<span class="link-dot off"></span>vLLM 数据不可用' + (s.id.includes('cs') || s.id.includes('gsm8k_0456') || s.id.includes('swe_task_0311') ? '（已过期）' : '');
+            const scoreClass = s.score === 0 ? 'fail' : 'pass';
+            const scoreSymbol = s.score === 0 ? '✗' : '✓';
+            return `<div class="sample-row${active}" onclick="selectSample('${s.id}')">
+                <div class="sample-score ${scoreClass}">${scoreSymbol}</div>
+                <div class="sample-info">
+                    <div class="sample-id">${s.id}</div>
+                    <div class="sample-meta"><span class="sample-cat" style="color:${s.catColor}">${s.cat}</span><span>Trace: ${s.trace || '—'}</span></div>
+                    <div class="sample-preview">${s.preview}</div>
+                    <div class="sample-trace">${traceHtml}</div>
+                </div>
+            </div>`;
+        }).join('');
+
+        // render detail panel
+        renderDetail(currentSample);
+    }
+
+    function renderDetail(s) {
+        const panel = document.getElementById('detailPanel');
+
+        let traceSection = '';
+        if (s.metrics) {
+            traceSection = `
+            <div class="detail-section">
+                <h4>🔗 关联的 vLLM Trace 指标</h4>
+                <div class="trace-card">
+                    <div class="trace-metric"><div class="val">${s.metrics.ttft}</div><div class="label">TTFT</div></div>
+                    <div class="trace-metric"><div class="val"${s.metrics.kvCacheBad ? ' style="color:var(--red)"' : ''}>${s.metrics.kvCache}</div><div class="label">KV Cache Hit</div></div>
+                    <div class="trace-metric"><div class="val"${s.metrics.preemptionsBad ? ' style="color:var(--red)"' : ''}>${s.metrics.preemptions}</div><div class="label">Preemptions</div></div>
+                    <div class="trace-metric"><div class="val">${s.metrics.decode}</div><div class="label">Decode Duration</div></div>
+                    <div class="trace-metric"><div class="val">${s.metrics.tokens}</div><div class="label">Output Tokens</div></div>
+                </div>
+                <a class="trace-link">→ 在 Jaeger 中查看完整 Trace</a>
+            </div>`;
+        } else {
+            traceSection = `
+            <div class="detail-section">
+                <h4>🔗 关联的 vLLM Trace 指标</h4>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;color:var(--text2);font-size:12px;">
+                    ⚠ 该 sample 的 vLLM 数据不可用（评测时 Prometheus/Jaeger 数据已过期）。<br>
+                    原始数据浏览不受影响，但归因分析不可用。
+                </div>
+            </div>`;
+        }
+
+        // Agent trajectory hint
+        let trajectoryHint = '';
+        if (s.trajectory) {
+            trajectoryHint = `
+            <div class="detail-section">
+                <h4>🤖 Agent Trajectory 概览</h4>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+                    <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:12px;">
+                        <div><span style="color:var(--accent);font-weight:700;">${s.trace.split('×')[1] || 'N/A'}</span> <span style="color:var(--text2);">Steps</span></div>
+                        <div><span style="color:var(--orange);font-weight:700;">${Math.floor(Math.random()*3)+2}</span> <span style="color:var(--text2);">Tools Called</span></div>
+                        <div><span style="color:var(--yellow);font-weight:700;">${(Math.random()*8+2).toFixed(1)}s</span> <span style="color:var(--text2);">Total Latency</span></div>
+                        <div><span style="color:var(--red);font-weight:700;">${Math.floor(Math.random()*3)+1}</span> <span style="color:var(--text2);">Redundant Steps</span></div>
+                    </div>
+                    <div style="margin-top:10px;font-size:10px;color:var(--text2);">点击 <a style="color:var(--accent);cursor:pointer;">展开完整 Trajectory 时间线</a>（Langfuse 风格 step-by-step 视图）</div>
+                </div>
+            </div>`;
+        }
+
+        panel.innerHTML = `
+            <div class="detail-header">
+                <h3>${s.id}</h3>
+                <div class="detail-meta">
+                    <span>📂 ${s.cat} / ${currentRun.split('-')[0]}</span>
+                    <span>🔗 trace: ${s.traceOn ? '<span style="color:var(--accent)">' + s.trace + '</span>' : '<span style="color:var(--text2)">—</span>'}</span>
+                    <span><span class="badge badge-fail">score: ${s.score}</span></span>
+                </div>
+            </div>
+            <div class="detail-section">
+                <h4>📝 Prompt</h4>
+                <div class="code-block">${escapeHtml(s.prompt)}</div>
+            </div>
+            <div class="detail-section">
+                <h4>❌ Prediction</h4>
+                <div class="code-block diff">${escapeHtml(s.prediction)}</div>
+            </div>
+            <div class="detail-section">
+                <h4>✅ Ground Truth</h4>
+                <div class="code-block pass">${escapeHtml(s.groundTruth)}</div>
+            </div>
+            <div style="font-size:11px; color:var(--yellow); margin-bottom:20px;">${s.matchNote}</div>
+            ${trajectoryHint}
+            ${traceSection}
+            <div class="detail-section">
+                <h4>📊 所属分类</h4>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+                    <span style="font-size:13px;font-weight:600;">${s.cluster.name}</span>
+                    <span style="font-size:11px;color:var(--text2);margin-left:8px;">${s.cluster.count} cases</span>
+                    <div style="font-size:11px;color:var(--text2);margin-top:6px;">${s.cluster.desc}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function selectSample(id) {
+        const run = runs[currentRun];
+        currentSample = run.samples.find(s => s.id === id);
+        renderPage();
+    }
+
+    // ======================== EVENTS ========================
+    document.getElementById('runSelect').addEventListener('change', function(e) {
+        currentRun = e.target.value;
+        currentSample = null;
+        renderPage();
+    });
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', 
+            (tab === 'all' && i === 0) || (tab === 'cluster' && i === 1) || (tab === 'agent' && i === 2)
+        ));
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ======================== INIT ========================
+    renderPage();
+    </script>
+</body>
+</html>
