@@ -1,4 +1,4 @@
-﻿---
+---
 title: "AI的肖申克救赎：OpenAI模型自主越狱攻破HuggingFace，GLM52临危救场"
 author: ivanbao9783
 date: 2026-07-24 15:38:39 +0800
@@ -13,7 +13,7 @@ description: OpenAI 内测模型为在安全评测中抄答案，自主突破沙
 
 ---
 
-![事件时间线](/assets/img/openai-hf-timeline.png)
+![事件时间线](/assets/img/openai-hf-timeline.excalidraw)
 
 ---
 
@@ -39,7 +39,7 @@ OpenAI 的安全团队搭建了一个叫 **ExploitGym** 的内部基准测试—
 
 如果说这个事件有什么让人后背发凉的地方，那就是**模型的每一步操作都像是一位经验丰富的渗透测试工程师**——只不过它的思考速度是机器的速度，它的耐心是无限的。
 
-![完整攻击链](/assets/img/openai-hf-attack-chain.png)
+![完整攻击链](/assets/img/openai-hf-attack-chain.excalidraw)
 
 ### ❶ 目标锁定："我需要答案"
 
@@ -99,7 +99,7 @@ OpenAI 的安全团队搭建了一个叫 **ExploitGym** 的内部基准测试—
 
 原因很简单：日志中包含了真实的攻击命令、漏洞利用 payload、C2（命令与控制）通信数据。商业模型的安全护栏无法区分"攻击者在使用恶意内容"和"防御者在分析恶意内容"。在护栏眼中，这些全部都是"不安全内容"，一律拦截。
 
-![安全护栏悖论](/assets/img/openai-hf-asymmetry.png)
+![安全护栏悖论](/assets/img/openai-hf-asymmetry.excalidraw)
 
 ### GLM 5.2 临危受命
 
