@@ -2,3 +2,29 @@
 layout: home
 # Index page
 ---
+
+<!-- 不蒜子访问量统计 -->
+<style>
+  .site-traffic {
+    text-align: center;
+    padding: 1rem 0;
+    margin: 1rem 0;
+    color: var(--text-muted-color, #6c757d);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--main-border-color, #dee2e6);
+  }
+  .site-traffic span {
+    color: var(--text-color, #212529);
+    font-weight: 600;
+    margin: 0 0.3rem;
+  }
+</style>
+
+<div class="site-traffic">
+  <i class="fas fa-chart-line"></i>
+  总访问量 <span id="busuanzi_value_site_pv"></span> 次
+  ·
+  总访客 <span id="busuanzi_value_site_uv"></span> 人
+</div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
