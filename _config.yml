@@ -19,7 +19,7 @@ title: ivanbao # the main title
 tagline: 个人博客 # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
-  ivanbao 的个人博客，记录技术笔记、论文解读与项目实践。
+  ivanbao 的个人博客，记录技术笔记、项目记录与个人思考。
 
 # Fill in the protocol & hostname for your site.
 # E.g. 'https://username.github.io', note that it does not end with a '/'.
@@ -98,8 +98,7 @@ theme_mode: # [light | dark]
 cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar:
-
+avatar: /assets/img/profile.png # 头像路径
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
 social_preview_image: # string, local or CORS resources

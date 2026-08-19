@@ -11,9 +11,9 @@ order: 4
 ## 本站内容
 
 - **技术笔记**: 工程实践、工具使用、踩坑记录
-- **论文解读**: 学术论文阅读笔记与批判性思考
 - **项目记录**: 个人项目的设计与实现
 
 ## 联系方式
 
 - GitHub: [@ivanbao9783](https://github.com/ivanbao9783)
+- Email: [ivanbao9783@gmail.com](mailto:ivanbao9783@gmail.com)
