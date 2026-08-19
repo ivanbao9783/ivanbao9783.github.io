@@ -1,0 +1,14 @@
+_posts/2026-07-24-eval-hotspot-openai-hf-jailbreak.md
+  h_18f306f4f1ed04 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "23416cbd48f05a0534b778a4007c7159443eeabd",
+  "prompts": {},
+  "humans": {
+    "h_18f306f4f1ed04": {
+      "author": "ivanbao9783 <ivanbao9783@gmail.com>"
+    }
+  }
+}
