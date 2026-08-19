@@ -1,0 +1,32 @@
+_layouts/home.html
+  s_81339677132215::t_2d9530bb1f5585 166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "5cca5b35e37a13f3d4d2f743d1f1909c1a144852",
+  "prompts": {},
+  "sessions": {
+    "s_81339677132215": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a850fac16fe8feb96ae9e45",
+        "model": "glm-5.2"
+      },
+      "human_author": "ivanbao9783 <ivanbao9783@gmail.com>",
+      "custom_attributes": {
+        "dedupe_key": "6a850fac16fe8feb96ae9e45:6a8558c116fe8feb96aea1f5:afterEdit:f891f9ed",
+        "tool_id": "icube:applyChatSnapshotPatch",
+        "external_session_id": "6a850fac16fe8feb96ae9e45",
+        "edit_kind": "file_edit",
+        "tool_use_id": "6a8558c116fe8feb96aea1f5",
+        "source_scene": "agent",
+        "tool_type": "builtin",
+        "session_id": "6a850fac16fe8feb96ae9e45",
+        "operation_id": "6a8558c116fe8feb96aea1f5",
+        "client_type": "ide",
+        "runtime_client": "trae-tob-git-ai"
+      }
+    }
+  }
+}
