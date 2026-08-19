@@ -1,10 +1,11 @@
-﻿---
+---
 title: "Langfuse：给你的 Agent 装上行车记录仪"
 author: ivanbao9783
 date: 2026-07-15 15:10:05 +0800
 categories: [技术笔记]
 tags: [Agent评测, Langfuse, 可观测性]
 description: Langfuse 给 Agent 装上行车记录仪：trace、span、observation 三层结构让你看透 Agent 的每一次决策。
+mermaid: true
 ---
 
 ---

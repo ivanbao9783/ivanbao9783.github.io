@@ -1,10 +1,11 @@
-﻿---
+---
 title: "从SWE家族看CodeAgent评测发展路径和方向"
 author: ivanbao9783
 date: 2026-07-20 15:51:37 +0800
 categories: [技术笔记]
 tags: [Agent评测, SWE-bench, Code Agent]
 description: 从 SWE 家族（SWE-bench、SWE-bench Verified、SWE-Marathon、FrontierSWE 等）看 Code Agent 评测的发展路径和方向。
+mermaid: true
 ---
 
 > 从"修 Bug"到"人类极限工程"——一套评测家族如何用不到三年时间，成为整个 AI 行业的默认度量衡。

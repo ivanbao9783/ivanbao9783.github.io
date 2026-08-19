@@ -1,10 +1,11 @@
-﻿---
+---
 title: "大模型评测进入 Agent 时代：AA-AgentPerf 如何重新定义硬件性能评测"
 author: ivanbao9783
 date: 2026-07-15 15:13:40 +0800
 categories: [技术笔记]
 tags: [评测系统, AA-AgentPerf, 硬件性能]
 description: 大模型评测进入 Agent 时代：AA-AgentPerf 如何重新定义硬件性能评测——真正的战场是并发智能体承载能力。
+mermaid: true
 ---
 
 > **核心金句：** 当所有人都在卷单次推理延迟时，`Artificial Analysis` 用一个新基准告诉我们——真正的战场，是"在满足服务质量的前提下，一台机器到底能撑住多少个并发智能体"。

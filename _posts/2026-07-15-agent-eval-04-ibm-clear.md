@@ -5,6 +5,7 @@ date: 2026-07-15 15:10:05 +0800
 categories: [技术笔记]
 tags: [Agent评测, LLM-as-a-Judge, IBM CLEAR]
 description: LLM-as-a-Judge 不是银弹：拆解 IBM CLEAR 框架如何给 AI Agent 做全身体检。
+mermaid: true
 ---
 
 > 从"能跑就行"到"量化诊断"——一个开源的企业级 Agent 事后审计框架深度解读
