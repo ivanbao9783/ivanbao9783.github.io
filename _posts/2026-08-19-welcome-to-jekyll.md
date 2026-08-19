@@ -29,7 +29,7 @@ flowchart LR
     B --> C[GitHub Actions 触发]
     C --> D[Jekyll 构建]
     D --> E[部署到 GitHub Pages]
-    E --> F[https://ivanbao.github.io]
+    E --> F[https://ivanbao9783.github.io]
 ```
 
 ## 排版验证
