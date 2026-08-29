@@ -1,7 +1,7 @@
 ---
 title: "拆解 LLM 推理结果异常检测系统：不看文本，只看概率"
 author: ivanbao9783
-date: 2026-08-19 21:00:00 +0800
+date: 2026-08-29 17:00:00 +0800
 categories: [技术笔记]
 tags: [LLM, 推理, 异常检测, 可观测性]
 description: "拆解 msprobe response_anomaly：不看输出文本，只靠 token 概率分布检测乱码、复读机与异常回复。"
