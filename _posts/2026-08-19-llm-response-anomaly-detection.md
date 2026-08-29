@@ -1,5 +1,5 @@
 ---
-title: "我拆了一套 LLM 异常检测系统：不看文本，只看概率"
+title: "拆解 LLM 推理结果异常检测系统：不看文本，只看概率"
 author: ivanbao9783
 date: 2026-08-19 21:00:00 +0800
 categories: [技术笔记]
@@ -36,35 +36,6 @@ mermaid: true
 **整体链路**
 
 数据从左到右流过四个阶段：两条并行的变换线，汇入三类检测：
-
-```mermaid
-flowchart LR
-    subgraph S1["① 原始输入"]
-        direction TB
-        A["topk_logprobs<br/>每位置 top-k 候选<br/>token id + logprob"]
-        B["model_config（配置文件路径）<br/>└ 词表: 词→id, 约 15 万"]
-    end
-
-    subgraph S3["③ 转换后形态"]
-        direction TB
-        P["概率矩阵<br/>排序 · 补齐 -inf · 行内降序<br/>NaN/Inf 入口截断<br/>滑窗 win=128, stride=64"]
-        K["tk2cat 家族字典<br/>id→家族, ~24 个标签"]
-    end
-
-    subgraph S4["④ 异常检测（依次过检）"]
-        direction TB
-        D1["生僻字<br/>低置信 + 家族发散<br/>只记标记, 陪跑到底"]
-        D2["乱码<br/>命中密度 > 20%<br/>触发即急停"]
-        D3["重复<br/>distinct-n + ACF 双算法<br/>跨窗口投票"]
-        D1 --> D2 --> D3
-    end
-
-    A -->|"② 概率矩阵化"| P
-    B -->|"② tk2cat 离线生成<br/>词:id → id:家族"| K
-    P --> S4
-    K --> S4
-    D3 --> R["输出 [是否异常, ill_type]<br/>0 正常 · 1 生僻字 · 2 乱码 · 3 重复 · 4 NaN/Inf"]
-```
 
 ![数据变换链路：原始输入长什么样，经过哪些关键转换，变成了什么](/assets/img/response-anomaly-data-pipeline.png)
 
@@ -308,5 +279,5 @@ ACF(k=3):  对不齐 → 值低
 
 文中这套检测的机制在 **AISBench** 与 **msprobe**（MindStudio）两个仓库里都能找到，资料链接在此，欢迎大家上手实践：
 
-- msprobe：https://gitcode.com/Ascend/msprobe/blob/master/docs/zh/user_guide/response_anomaly_instruct.md
-- AISBench：https://github.com/AISBench/benchmark/blob/master/docs/source_zh_cn/advanced_tutorials/response_anomaly_detection.md
+- msprobe 使用文档：[response_anomaly_instruct.md（gitcode）](https://gitcode.com/Ascend/msprobe/blob/master/docs/zh/user_guide/response_anomaly_instruct.md)
+- AISBench 使用文档：[response_anomaly_detection.md（GitHub）](https://github.com/AISBench/benchmark/blob/master/docs/source_zh_cn/advanced_tutorials/response_anomaly_detection.md)
