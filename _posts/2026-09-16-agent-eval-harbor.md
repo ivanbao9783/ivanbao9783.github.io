@@ -4,15 +4,13 @@ author: ivanbao9783
 date: 2026-09-16 16:00:00 +0800
 categories: [技术笔记]
 tags: [Agent评测, Harbor, 评测框架, CI/CD]
-description: 以"考试制度"为隐喻拆解开源评测框架 Harbor：N×M 适配困境的 N+M 解法，编排、沙箱、判卷三大核心机制，以及从轨迹归因到 CI/CD 化的落地实践。
+description: 以"考试制度"为隐喻拆解开源评测框架 Harbor：N×M 适配困境的 N+M 解法，编排、沙箱、判卷三大核心机制，以及拿到分数之后比分数更重要的两件事——轨迹归因与 CI/CD 化。
 math: true
 ---
 
 > 3 个 Agent × 2 个数据集 = 6 套适配代码——Agent 评测的 N×M 困境，意味着每换一次模型、改一次 prompt，就要重新交一遍"适配税"。
 >
 > 这篇文章以"考试制度"为隐喻，拆解开源评测框架 Harbor 如何把这笔账改写成 N+M：统一考卷、隔离考场、独立判卷、归一化分数；以及拿到分数之后，比分数更重要的两件事——轨迹归因与 CI/CD 化。
-
-⏱️ 阅读时间：约 18 分钟
 
 ---
 
@@ -21,7 +19,6 @@ math: true
 - [x] Agent 评测 N×M 适配困境的根源与 N+M 统一接入范式
 - [x] 用"考试制度"隐喻理解评测框架五大组件：Task / Agent / Sandbox / Verifier / Job
 - [x] 编排（Trial 矩阵 + 信号量闸门 + 优雅退出）、沙箱（双轨抽象 + 懒加载注册表）、判卷（test.patch 防泄漏 + 无偏 pass@k）三大核心机制
-- [x] DeepSWE × mini-swe-agent 实战：从 30 秒起跑到四组产物的归因路径
 - [x] "轨迹 > 分数"的迭代逻辑与评测 CI/CD 化的前置条件
 
 ---
@@ -86,22 +83,20 @@ Harbor 就是奔着这层来的——把 N×M 的账改写成 **N+M**：数据�
 
 没有这四样，考试就是走过场。
 
-Agent 评测同理——格式不统一，就是考卷不标准；环境互相污染，就是考场不隔离；Agent 自己验证自己，就是考生判自己的卷。
-
-Harbor 的全部设计，就是把这套考试制度工程化：
-
-| 考试 | Agent 评测 | Harbor 落点 |
-|---|---|---|
-| 考卷 | Task：任务 + 环境 + 测试 | `task.toml` + `instruction.md` + `tests/` |
-| 考生 | Agent：开源 or 自研 | 30+ 内置接入 + 自定义扩展 |
-| 考场 | Sandbox：隔离执行环境 | 本地 Docker / 云端双轨 |
-| 判卷人 | Verifier：独立验证 | `test.sh` + grader |
-| 教务处 | Job：编排调度 + 汇总 | Trial 调度 + pass@k |
-| 成绩单 | 结果汇总：收集 + 聚合 | 统一收集 + pass@k 报告 |
-
 ![隐喻图：一场 Agent 考试——考卷、考生、考场、判卷人、教务处与成绩单的对应](/assets/img/blog-view1-metaphor.png)
 
-这些抽象的概念落到具象的软件架构上，是这样的：
+Agent 评测同理——格式不统一，就是考卷不标准；环境互相污染，就是考场不隔离；Agent 自己验证自己，就是考生判自己的卷。
+
+| 考试 | Agent 评测 |
+|---|---|
+| 考卷 | Task：任务 + 环境 + 测试 |
+| 考生 | Agent：开源 or 自研 |
+| 考场 | Sandbox：隔离执行环境 |
+| 判卷人 | Verifier：独立验证 |
+| 教务处 | Job：编排调度 + 汇总 |
+| 成绩单 | 结果汇总：收集 + 聚合 |
+
+Harbor 的全部设计，就是把这套考试制度工程化：
 
 ![Harbor 整体架构：数据层、编排层、沙箱层、结果层自上而下流转](/assets/img/blog-view2-architecture.png)
 
@@ -111,21 +106,21 @@ Harbor 的全部设计，就是把这套考试制度工程化：
 
 **数据集层** 是题库——DeepSWE 适配成一份份标准 Task，每份 Task 就是一张考卷。
 
+**Agent 层** 是考生库——每个 Agent（开源的 mini-swe-agent、claude-code，或你的自研 Agent）都按 `BaseAgent` 的统一接口接入，注册一次，就能和题库里任何考卷自由组合。
+
 **编排层** 是教务处——Job 把"哪些考生 × 哪些考卷 × 考几次"拆成一个个 Trial，统一调度、并行执行。
 
 **沙箱层** 是考场——每个 Trial 分到一间独立沙箱，本地 Docker 或云端任选其一，考生在各自考场里独立作答。
 
 **结果层** 是成绩单——所有 Trial 从同一个出口交卷：统一收集 patch、reward 和轨迹，再按 agent × model × dataset 汇总成可比的分数。它是编排层的收尾环节，也是整条流水线的最终交付物。
 
-五个环节各司其职，每个只对相邻环节负责。你以后看任何评测框架，都可以拿这套"考试制度"去套。
-
-不过，一个评测框架的真实功力，藏在三个容易出事的地方：**编排层怎么驯服上百个 Trial？沙箱层怎么一套接口管住两种世界？判卷怎么做到独立可信？**
-
-这三问，正好对应流水线上最见功力的三个部件。
+六个环节各司其职，每个只对相邻环节负责。你以后看任何评测框架，都可以拿这套"考试制度"去套。
 
 ---
 
 ## 三、拆解：编排 / 沙箱 / 判卷——流水线上最见功力的三个部件
+
+> 不过，一个评测框架的真实功力，藏在三个容易出事的地方：**编排层怎么驯服上百个 Trial？沙箱层怎么一套接口管住两种世界？判卷怎么做到独立可信？**
 
 ### 3.1 编排层：当上百个 Trial 涌向你的机器
 
@@ -201,7 +196,7 @@ EnvFactory 进来，查表，拿到模块路径和类名。就这么直接——
 
 ### 3.3 判卷层：一份 patch 的最终命运
 
-考试考完了，答案在哪？
+![图D：判卷与汇总——patch 接力进验证考场，reward 统一收集、汇总成 pass@k](/assets/img/blog-figD-verdict-aggregation.png)
 
 推理沙箱里的 Agent 留下了改动——但沙箱马上就要销毁了。所以在停止之前，有个抢救动作：**collect**。通过 service 执行 `git diff`，把改动导出成 `model.patch`。
 
@@ -209,9 +204,7 @@ EnvFactory 进来，查表，拿到模块路径和类名。就这么直接——
 
 **防泄漏机制**
 
-然后是最有讲究的一步：**验证环境 = 原始环境 + model.patch + test.patch**。
-
-![图D：判卷与汇总——patch 接力进验证考场，reward 统一收集、汇总成 pass@k](/assets/img/blog-figD-verdict-aggregation.png)
+这是最有讲究的一步：**验证环境 = 原始环境 + model.patch + test.patch**。
 
 model.patch 好理解——考生的答案。**test.patch 是什么？为什么判卷还要再打一层补丁？**
 
@@ -225,9 +218,7 @@ model.patch 好理解——考生的答案。**test.patch 是什么？为什么�
 
 分数最终写入 `/logs/verifier/reward.txt`——一个再简单不过的标准化出口：**所有数据集、所有 Agent、所有沙箱，最终都从这一个出口交卷。**
 
-单场考试的分数有了，最后一步：**归一化汇总**。
-
-每个 Trial 产出四样东西：reward、model.patch、ATIF 轨迹（一种标准化的轨迹交换格式，第五章会展开）、日志，落到 `trials/` 目录。Job 结束时按 `{agent}__{model}__{dataset}`（这个分组键叫 **evals_key**）分组，和历史 Trial 一起，算出**无偏 pass@k**：
+每个 Trial 产出四样东西：reward、model.patch、ATIF 轨迹（一种标准化的轨迹交换格式）、日志，落到 `trials/` 目录。Job 结束时按 `{agent}__{model}__{dataset}`（这个分组键叫 **evals_key**）分组，和历史 Trial 一起，算出**无偏 pass@k**：
 
 $$pass@k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}$$
 
@@ -237,201 +228,7 @@ n 个样本里 c 个通过，随机抽 k 个全不中的概率被减掉——不
 
 ---
 
-## 四、实战切片：DeepSWE × mini-swe-agent
-
-### 4.1 30 秒起跑
-
-```bash
-# 安装
-uv tool install harbor
-
-# 跑起来：DeepSWE × mini-swe-agent
-harbor run --dataset deepswe --agent mini-swe-agent \
-  --model openai/deepseek-v4-pro \
-  --ae OPENAI_BASE_URL=https://api.deepseek.com/v1 \
-  --ae OPENAI_API_KEY=$OPENAI_API_KEY \
-  --n-concurrent 4
-```
-
-回车，流水线启动：
-
-```
-Running trials… ━━━━━━━━━━━━ 12/113
-  ts-pattern-match-each__9giF4pL: running agent…
-  tomlkit-toml-table-converters__BVG4s9W: verifying…
-  abs-module-cache-flags__k3Fq2x: starting environment…
-```
-
-谁在推理、谁在起沙箱、谁在判卷，一目了然。
-
-### 4.2 DeepSWE 的考卷长什么样
-
-评测过程中，我们可以趁机了解下考卷内容。每个 DeepSWE 任务，适配后就是一个标准 Task 目录——这是一份真实的：
-
-```
-ts-pattern-match-each/
-├── task.toml          # 考务信息：超时、资源、元数据
-├── instruction.md     # 题面：Agent 看到的全部世界
-├── environment/
-│   └── Dockerfile     # 推理考场的图纸
-├── solution/          # 参考解法（供人查阅与冒烟验证，判卷不用它）
-│   ├── solution.patch
-│   └── solve.sh
-└── tests/             # 判卷部门
-    ├── Dockerfile     # 验证考场的图纸
-    ├── test.patch     # 隐藏考题：判卷时才注入
-    ├── test.sh        # 判卷编排
-    ├── grader.py      # 判分引擎
-    └── config.json
-```
-
-注意 `tests/` 目录——第三章讲的判卷机制，实物全在这里：
-- test.patch 就是那个"对 Agent 保密的测试"。
-- grader.py 就是那个"独立的判分引擎"。
-- tests/Dockerfile 就是 SEPARATE 模式下那间"全新的验证考场"。
-
-再看题面。`instruction.md` 是 Agent 看到的全部世界，真实的题面长这样（英文原文）：
-
-> Please solve this issue: ts-pattern's `match` short-circuits on the first matching pattern. Add a new top-level function `matchEach` that evaluates ALL registered patterns against the input and collects every matching handler's result into an array, returned in the order clauses were declared.
->
-> （译：ts-pattern 的 `match` 在首个匹配处短路。请新增顶层函数 `matchEach`：对所有注册模式求值，收集全部命中 handler 的结果，按声明顺序返回数组。）
-
-没有测试代码，没有 hint，没有判分逻辑——**这就是 test.patch 保密设计场景下 Agent 拿到的真实考题**。
-
-### 4.3 分数之外的战场：从产物里做一次归因
-
-评测跑完，终端打出一张汇总表——你拿到一个 pass@1。
-
-数字本身不提供任何行动指引——**它只告诉你"多差"，不告诉你"为什么差"**。
-
-好消息是，判卷需要的所有材料，Harbor 都替你留下来了。打开结果目录，一个 Trial 的产物长这样（真实目录）：
-
-```
-ts-pattern-match-each__9giF4pL/
-├── result.json                        # 全局档案：配置、耗时、token 成本
-├── agent/
-│   ├── trajectory.json                # ATIF 轨迹：完整作答过程
-│   └── mini-swe-agent.txt             # Agent 原始日志
-├── artifacts/
-│   └── logs/artifacts/model.patch     # Agent 的最终改动
-└── verifier/
-    ├── reward.json                    # 判卷结果
-    ├── ctrf.json                      # 91 个测试的逐条报告
-    ├── test-stdout.txt                # 判卷原始输出
-    └── reports/                       # 测试框架原生报告（JUnit XML 等）
-```
-
-四组产物，各管一段。归因的时候可以按这个顺序看。
-
-**第一站：verifier/reward.json——分数的解剖图。**
-
-```json
-{
-  "reward": 1,
-  "f2p_total": 85, "f2p_passed": 85,
-  "p2p_total": 6,  "p2p_passed": 6
-}
-```
-
-这一个 Trial 满分。但真正有价值的是两个细分维度：
-
-- **f2p（fail to pass）**：修复前挂掉、修复后必须通过的测试——**这就是考题本身**；
-- **p2p（pass to pass）**：修复前就通过、修复后也必须通过的测试——**"别把对的改坏了"**。
-
-**第二站：verifier/test-stdout.txt——判卷现场录像。**
-
-```
-[verifier] model.patch applied (33272 bytes)
-[verifier] Resetting files touched by test.patch
-[verifier] Applying test.patch
-PASS tests/match-each.test.ts
-  matchEach
-    basic behavior
-      ✓ should collect all matching handler results (4 ms)
-      ✓ should return results in declaration order (1 ms)
-      ✓ should NOT short-circuit on first match (1 ms)
-      ✓ should behave differently from match (match short-circuits)
-      ✓ should return an array with one element when only one matches
-    .run() and .exhaustive()
-      ✓ .run() should throw NonExhaustiveError when nothing matches (36 ms)
-      ✓ .exhaustive() without fallback should throw NonExhaustiveError
-      ...
-```
-
-这就是这个 Trial 的真实打分实录：**先打 model.patch（考生答案），再注入 test.patch（隐藏考题），然后起测试**。
-
-**第三站：model.patch + trajectory.json——从结果回溯过程。**
-
-model.patch 是 Agent 交出的 diff，改动是否精准落在问题文件，一眼便知。trajectory.json（ATIF 格式）则是完整的过程记录——每一次 LLM 调用、每一次工具执行。
-
-这个 Trial 的轨迹有 88 步，浓缩成骨架长这样：
-
-```json
-{
-  "schema_version": "ATIF-v1.7",
-  "agent": { "name": "mini-swe-agent", "model_name": "openai/deepseek-v4-pro" },
-  "steps": [
-    { "step_id": 1, "source": "system",
-      "message": "You are a helpful assistant that can interact with a computer." },
-    { "step_id": 2, "source": "user",
-      "message": "Please solve this issue: ts-pattern's `match` short-circuits..." },
-    { "step_id": 3, "source": "agent",
-      "reasoning_content": "Let me start by exploring the repository structure...",
-      "tool_calls": [{ "function_name": "bash",
-        "arguments": { "command": "pwd && ls -la && git status" } }],
-      "observation": { "results": ["（工具执行输出，略）"] },
-      "metrics": { "prompt_tokens": 1707, "completion_tokens": 84 } },
-    "...（中间 84 步：读代码 → 写实现 → 跑测试 → 迭代修复，此处略）...",
-    { "step_id": 88, "source": "agent",
-      "message": "The implementation is complete and committed on branch `feat/match-each`...",
-      "tool_calls": [{ "function_name": "bash",
-        "arguments": { "command": "echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT" } }] }
-  ]
-}
-```
-
-每一步都是"**思考 → 动作 → 观察**"的三元组：`reasoning_content` 是 Agent 想什么，`tool_calls` 是做什么，`observation` 是看见什么，`metrics` 记下这一步花了多少 token。
-重点看两处：**转折点**（从"探索"切到"修改"的那一步，方向对不对）和**最后几步**（是改完跑测试挂了，还是上下文耗尽草草收场）。
-
-**第四站：result.json——全局账本。**
-
-```json
-{
-    "agent_result": {
-        "n_input_tokens": 6729515,
-        "n_cache_tokens": 6645376,
-        "n_output_tokens": 59270
-    },
-    "started_at": "2026-09-07T08:04:34.202557Z",
-    "finished_at": "2026-09-07T08:28:54.046154Z",
-    "environment_setup": {
-        "started_at": "2026-09-07T08:04:34.260281Z",
-        "finished_at": "2026-09-07T08:04:37.156134Z"
-    },
-    "agent_setup": {
-        "started_at": "2026-09-07T08:06:27.877439Z",
-        "finished_at": "2026-09-07T08:06:28.399597Z"
-    },
-    "agent_execution": {
-        "started_at": "2026-09-07T08:06:28.399741Z",
-        "finished_at": "2026-09-07T08:28:11.207601Z"
-    },
-    "verifier": {
-        "started_at": "2026-09-07T08:28:25.866457Z",
-        "finished_at": "2026-09-07T08:28:54.046140Z"
-    }
-}
-```
-
-从 result.json 可以看出，这个 Trial 花了 24 分钟，其中推理 22 分钟、判卷 28 秒；烧了 670 万 input token（其中 660 万命中缓存）。
-
-总体来说：**reward 看判定，stdout 看现场，patch 看结果，轨迹看过程** —— 四组产物交叉对照，一个 Trial 的死活基本就清楚了。
-
-这也是为什么 Harbor 把轨迹和 patch 当作一等公民产物，和 reward 一起落盘。
-
----
-
-## 五、统一的红利：拿到分数之后，比赛才刚开始
+## 四、统一的红利：拿到分数之后，比赛才刚开始
 
 前面一直在讲"统一"：统一的考卷、统一的考场、统一的判卷。但统一到底买来了什么？
 
@@ -447,7 +244,7 @@ model.patch 是 Agent 交出的 diff，改动是否精准落在问题文件，�
 
 这就是统一的深水区，两件事决定胜负。
 
-### 5.1 轨迹 > 分数
+### 4.1 轨迹 > 分数
 
 一个 Agent 的迭代循环长这样：
 
@@ -463,7 +260,7 @@ model.patch 是 Agent 交出的 diff，改动是否精准落在问题文件，�
 
 **分数是结论，轨迹是证据；结论会过时，证据永远可以重新审视。**
 
-### 5.2 从"跑一次"到"每次提交都跑"
+### 4.2 从"跑一次"到"每次提交都跑"
 
 把评测搬进 CI/CD —— 让"可自动化"这份红利兑现。
 
@@ -480,7 +277,7 @@ model.patch 是 Agent 交出的 diff，改动是否精准落在问题文件，�
 
 ---
 
-## 六、结语
+## 五、结语
 
 评测的可信度来自制度设计，不是数据集和 Agent 数量的堆砌。
 
