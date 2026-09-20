@@ -42,8 +42,8 @@
     {% for cluster in map.clusters %}
       <g class="starmap-cluster sm-cg-{{ cluster.id }}">
         <ellipse class="sm-aura" cx="{{ cluster.ellipse.cx }}" cy="{{ cluster.ellipse.cy }}" rx="{{ cluster.ellipse.rx }}" ry="{{ cluster.ellipse.ry }}" fill="url(#sm-aura-{{ cluster.id }})"></ellipse>
-        <text class="sm-cluster-label sm-label-paper" x="{{ cluster.ellipse.cx | minus: cluster.ellipse.rx | plus: 12 }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 28 }}">{{ cluster.title }}</text>
-        <line class="sm-label-rule" x1="{{ cluster.ellipse.cx | minus: cluster.ellipse.rx | plus: 12 }}" y1="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 38 }}" x2="{{ cluster.ellipse.cx | minus: cluster.ellipse.rx | plus: 64 }}" y2="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 38 }}"></line>
+        <text class="sm-cluster-label sm-label-paper" x="{{ cluster.ellipse.cx }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 28 }}">{{ cluster.title }}</text>
+        <line class="sm-label-rule" x1="{{ cluster.ellipse.cx | minus: 26 }}" y1="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 40 }}" x2="{{ cluster.ellipse.cx | plus: 26 }}" y2="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 40 }}"></line>
         <text class="sm-cluster-label sm-label-space" x="{{ cluster.ellipse.cx }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 30 }}">{{ cluster.title }}</text>
       </g>
     {% endfor %}
