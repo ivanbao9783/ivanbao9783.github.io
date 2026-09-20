@@ -7,13 +7,13 @@ theme_default: paper # paper(羊皮纸/atlas) | space(深空/celestial)
 clusters:
   - id: eval-system
     title: 评测系统
-    ellipse: { cx: 280, cy: 400, rx: 255, ry: 300 }
+    ellipse: { cx: 270, cy: 430, rx: 250, ry: 300 }
     nodes:
       - id: harness
         title: 评测框架
         status: deep
         x: 300
-        y: 235
+        y: 265
         posts:
           - 2026-07-15-agent-eval-harness.md
           - 2026-07-15-agent-eval-02-evalscope.md
@@ -24,14 +24,14 @@ clusters:
         parent: harness
         status: deep
         x: 455
-        y: 250
+        y: 280
         url: /domains/eval-system/harness/
         posts: []
       - id: paradigm
         title: 评测范式
         status: deep
         x: 150
-        y: 390
+        y: 420
         posts:
           - 2026-07-15-agent-eval-01-paradigm-shift.md
           - 2026-07-15-agent-eval-04-ibm-clear.md
@@ -40,37 +40,37 @@ clusters:
         title: 评测热点
         status: seeded
         x: 320
-        y: 470
+        y: 500
         posts:
           - 2026-07-24-eval-hotspot-openai-hf-jailbreak.md
       - id: engineering
         title: 评测工程化
         status: planned
         x: 250
-        y: 555
+        y: 585
         posts: []
       - id: hardware
         title: 硬件评测
         status: seeded
         x: 105
-        y: 580
+        y: 610
         posts:
           - 2026-07-15-eval-system-aa-agentperf.md
       - id: performance
         title: 性能评测
         status: planned
         x: 380
-        y: 625
+        y: 655
         posts: []
   - id: dataset
     title: 数据集
-    ellipse: { cx: 700, cy: 225, rx: 175, ry: 155 }
+    ellipse: { cx: 700, cy: 230, rx: 170, ry: 150 }
     nodes:
       - id: corpus
         title: 开源数据集全景
         status: deep
         x: 650
-        y: 170
+        y: 175
         posts:
           - 2026-07-15-eval-system-worldscore.md
           - 2026-07-20-agent-eval-05-swe-family.md
@@ -78,60 +78,60 @@ clusters:
         title: 数据集压缩
         status: seeded
         x: 765
-        y: 290
+        y: 300
         posts:
           - 2026-08-19-eval-data-mini-data-compression.md
   - id: scoring
     title: 评分与诊断
-    ellipse: { cx: 700, cy: 505, rx: 160, ry: 145 }
+    ellipse: { cx: 690, cy: 545, rx: 145, ry: 125 }
     nodes:
       - id: metrics
         title: Rubric 与指标设计
         status: planned
         x: 700
-        y: 435
+        y: 470
         posts: []
       - id: observability
         title: 可观测性
         status: seeded
         x: 630
-        y: 555
+        y: 585
         posts:
           - 2026-07-15-agent-eval-03-langfuse.md
       - id: anomaly
         title: 异常检测
         status: seeded
         x: 775
-        y: 555
+        y: 585
         posts:
           - 2026-08-29-llm-response-anomaly-detection.md
   - id: edge
     title: 周边领域
-    ellipse: { cx: 1020, cy: 520, rx: 225, ry: 215 }
+    ellipse: { cx: 1075, cy: 540, rx: 200, ry: 185 }
     nodes:
       - id: agent
         title: Agent 知识
         status: planned
-        x: 935
-        y: 420
+        x: 950
+        y: 455
         posts: []
       - id: model-arch
         title: 模型结构
         status: planned
-        x: 1095
-        y: 410
+        x: 1110
+        y: 445
         posts: []
       - id: inference
         title: 推理知识
         status: planned
-        x: 915
-        y: 600
+        x: 930
+        y: 635
         posts: []
       - id: training
         title: 训练知识
         status: planned
-        x: 1090
-        y: 610
+        x: 1105
+        y: 645
         posts: []
 
 edges:

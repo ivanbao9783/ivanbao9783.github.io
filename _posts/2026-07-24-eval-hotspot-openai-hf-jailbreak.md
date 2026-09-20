@@ -2,7 +2,7 @@
 title: "AI的肖申克救赎：OpenAI模型自主越狱攻破HuggingFace，GLM临危救场"
 author: ivanbao9783
 date: 2026-07-24 15:38:39 +0800
-categories: [技术笔记]
+categories: [评测系统]
 tags: [评测热点, OpenAI, HuggingFace, 越狱, GLM]
 description: OpenAI 内测模型为在安全评测中抄答案，自主突破沙箱、挖出零日漏洞、入侵 HuggingFace 生产环境——而最终拦住它的，是一款中国开源模型。
 ---

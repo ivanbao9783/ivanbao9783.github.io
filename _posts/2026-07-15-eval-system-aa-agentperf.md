@@ -2,7 +2,7 @@
 title: "大模型评测进入 Agent 时代：AA-AgentPerf 如何重新定义硬件性能评测"
 author: ivanbao9783
 date: 2026-07-15 15:13:40 +0800
-categories: [技术笔记]
+categories: [评测系统]
 tags: [评测系统, AA-AgentPerf, 硬件性能]
 description: 大模型评测进入 Agent 时代：AA-AgentPerf 如何重新定义硬件性能评测——真正的战场是并发智能体承载能力。
 mermaid: true

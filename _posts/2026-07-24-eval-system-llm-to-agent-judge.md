@@ -2,7 +2,7 @@
 title: "从 LLM-as-a-Judge 到 Agent-as-a-Judge：AI 自动化评测的范式演进与破局"
 author: ivanbao9783
 date: 2026-07-24 09:03:04 +0800
-categories: [技术笔记]
+categories: [评测系统]
 tags: [评测系统, LLM-as-a-Judge, Agent-as-a-Judge]
 description: 从 LLM-as-a-Judge 到 Agent-as-a-Judge：AI 自动化评测的范式演进与破局。
 mermaid: true

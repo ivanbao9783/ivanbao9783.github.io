@@ -1,8 +1,8 @@
-﻿---
+---
 title: "EvalScope的Agent评测系统"
 author: ivanbao9783
 date: 2026-07-15 15:10:05 +0800
-categories: [技术笔记]
+categories: [评测系统]
 tags: [Agent评测, EvalScope, 评测框架]
 description: EvalScope 的 Agent 评测系统：从多轮对话到工具调用、从结果评测到过程评测的完整方案。
 ---

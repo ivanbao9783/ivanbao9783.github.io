@@ -2,7 +2,7 @@
 title: "为 Agent 编写的《五年高考三年模拟》：一套评测范式的工程化落地"
 author: ivanbao9783
 date: 2026-09-16 16:00:00 +0800
-categories: [技术笔记]
+categories: [评测系统]
 tags: [Agent评测, Harbor, 评测框架, CI/CD]
 description: 以"考试制度"为隐喻拆解开源评测框架 Harbor：N×M 适配困境的 N+M 解法，编排、沙箱、判卷三大核心机制，以及拿到分数之后比分数更重要的两件事——轨迹归因与 CI/CD 化。
 math: true

@@ -2,8 +2,8 @@
 title: "只测 3% 的题，就能还原模型评测结论？——评测集压缩的几种玩法"
 author: ivanbao9783
 date: 2026-08-19 10:30:00 +0800
-categories: [技术笔记]
-tags: [评测系统, 数据压缩, mini-data]
+categories: [数据集]
+tags: [数据集, 数据压缩, mini-data]
 description: 只测 3% 的题，就能还原模型评测结论？五种评测集压缩算法横向对比：从 K-Means 聚类到 EssenceBench 排名一致性，附团队实践与选型建议。
 ---
 

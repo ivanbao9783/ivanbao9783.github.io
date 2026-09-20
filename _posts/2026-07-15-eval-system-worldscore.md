@@ -1,9 +1,9 @@
-﻿---
+---
 title: "WorldScore：统一世界模型评测基准"
 author: ivanbao9783
 date: 2026-07-15 15:10:05 +0800
-categories: [技术笔记]
-tags: [评测系统, WorldScore, 世界模型]
+categories: [数据集]
+tags: [数据集, WorldScore, 世界模型]
 description: WorldScore：统一世界模型评测基准——从静态图像到动态视频、从感知到物理一致性。
 ---
 

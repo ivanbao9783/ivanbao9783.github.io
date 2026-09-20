@@ -31,7 +31,15 @@ layout: default
     background-color: var(--map-bg);
     background-image: radial-gradient(var(--map-dot) 1px, transparent 1.4px);
     background-size: 26px 26px;
-    padding: 1.1rem 1.4rem 1.2rem;
+    padding: 0.65rem 0.85rem 0.8rem;
+  }
+
+  /* 大屏 full-bleed：向内容列两侧页边扩展，放大星图 */
+  @media (min-width: 1200px) {
+    .starmap-article { margin-inline: -2rem; }
+  }
+  @media (min-width: 1600px) {
+    .starmap-article { margin-inline: -3.2rem; }
   }
   .starmap-canvas.theme-space {
     --map-bg: #0a101e;
