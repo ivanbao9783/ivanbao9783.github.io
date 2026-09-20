@@ -3,6 +3,21 @@
 <div class="starmap-viewport" id="starmap">
 
   <svg viewBox="0 0 1280 800" role="img" aria-label="LLM 与 Agent 评测知识星图" text-rendering="geometricPrecision">
+    <defs>
+      <radialGradient id="sm-grad-deep" cx="35%" cy="30%" r="85%">
+        <stop offset="0%" class="sm-stop-hi"></stop>
+        <stop offset="100%" class="sm-stop-lo"></stop>
+      </radialGradient>
+      <radialGradient id="sm-grad-seeded" cx="35%" cy="30%" r="85%">
+        <stop offset="0%" class="sm-stop-hi"></stop>
+        <stop offset="100%" class="sm-stop-lo"></stop>
+      </radialGradient>
+      <radialGradient id="sm-grad-planned" cx="35%" cy="30%" r="85%">
+        <stop offset="0%" class="sm-stop-hi"></stop>
+        <stop offset="100%" class="sm-stop-lo"></stop>
+      </radialGradient>
+    </defs>
+
     {% comment %} 连线垫底 {% endcomment %}
     {% for edge in map.edges %}
       {% assign from_parts = edge.from | split: "." %}
@@ -25,7 +40,7 @@
 
     {% comment %} 星团边界与标题 {% endcomment %}
     {% for cluster in map.clusters %}
-      <g class="starmap-cluster">
+      <g class="starmap-cluster starmap-cluster-{{ cluster.id }}">
         <ellipse cx="{{ cluster.ellipse.cx }}" cy="{{ cluster.ellipse.cy }}" rx="{{ cluster.ellipse.rx }}" ry="{{ cluster.ellipse.ry }}"></ellipse>
         <text class="starmap-cluster-title" x="{{ cluster.ellipse.cx }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 24 }}">{{ cluster.title }}</text>
       </g>
@@ -43,11 +58,11 @@
           {% assign node_url = '/domains/' | append: cluster.id | append: '/' | append: node.id | append: '/' %}
         {% endif %}
         <a href="{{ node_url | relative_url }}"
-           class="starmap-node starmap-node-{{ node.status }}"
+           class="starmap-node starmap-node-{{ node.status }}{% if node.kind == 'tool' %} starmap-node-tool{% endif %}"
            data-cluster="{{ cluster.title }}"
            data-title="{{ node.title }}"
            data-posts="{{ node.posts.size }}">
-          <circle cx="{{ node.x }}" cy="{{ node.y }}" r="{{ r }}"></circle>
+          <circle cx="{{ node.x }}" cy="{{ node.y }}" r="{{ r }}" fill="url(#sm-grad-{{ node.status }})"></circle>
           <text x="{{ node.x }}" y="{{ node.y | plus: r | plus: 16 }}">{{ node.title }}</text>
         </a>
       {% endfor %}
