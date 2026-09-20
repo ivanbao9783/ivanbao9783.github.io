@@ -18,15 +18,6 @@ clusters:
           - 2026-07-15-agent-eval-harness.md
           - 2026-07-15-agent-eval-02-evalscope.md
           - 2026-09-16-agent-eval-harbor.md
-      - id: harbor
-        title: Harbor
-        kind: tool
-        parent: harness
-        status: deep
-        x: 455
-        y: 280
-        url: /domains/eval-system/harness/
-        posts: []
       - id: paradigm
         title: 评测范式
         status: deep
@@ -39,16 +30,10 @@ clusters:
       - id: hotspot
         title: 评测热点
         status: seeded
-        x: 320
-        y: 500
+        x: 290
+        y: 545
         posts:
           - 2026-07-24-eval-hotspot-openai-hf-jailbreak.md
-      - id: engineering
-        title: 评测工程化
-        status: planned
-        x: 250
-        y: 585
-        posts: []
       - id: hardware
         title: 硬件评测
         status: seeded
@@ -135,10 +120,6 @@ clusters:
         posts: []
 
 edges:
-  - from: dataset.compression
-    to: eval-system.engineering
-    type: cost
-    label: 评测成本
   - from: eval-system.paradigm
     to: scoring.metrics
     type: method
