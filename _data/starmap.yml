@@ -30,15 +30,15 @@ clusters:
       - id: hotspot
         title: 评测热点
         status: seeded
-        x: 290
-        y: 545
+        x: 320
+        y: 515
         posts:
           - 2026-07-24-eval-hotspot-openai-hf-jailbreak.md
       - id: hardware
         title: 硬件评测
         status: seeded
-        x: 105
-        y: 610
+        x: 135
+        y: 580
         posts:
           - 2026-07-15-eval-system-aa-agentperf.md
       - id: performance
@@ -68,54 +68,54 @@ clusters:
           - 2026-08-19-eval-data-mini-data-compression.md
   - id: scoring
     title: 评分与诊断
-    ellipse: { cx: 690, cy: 545, rx: 145, ry: 125 }
+    ellipse: { cx: 690, cy: 550, rx: 145, ry: 130 }
     nodes:
       - id: metrics
         title: Rubric 与指标设计
         status: planned
         x: 700
-        y: 470
+        y: 510
         posts: []
       - id: observability
         title: 可观测性
         status: seeded
         x: 630
-        y: 585
+        y: 595
         posts:
           - 2026-07-15-agent-eval-03-langfuse.md
       - id: anomaly
         title: 异常检测
         status: seeded
         x: 775
-        y: 585
+        y: 595
         posts:
           - 2026-08-29-llm-response-anomaly-detection.md
   - id: edge
     title: 周边领域
-    ellipse: { cx: 1075, cy: 540, rx: 200, ry: 185 }
+    ellipse: { cx: 1090, cy: 540, rx: 185, ry: 185 }
     nodes:
       - id: agent
         title: Agent 知识
         status: planned
-        x: 950
+        x: 980
         y: 455
         posts: []
       - id: model-arch
         title: 模型结构
         status: planned
-        x: 1110
+        x: 1140
         y: 445
         posts: []
       - id: inference
         title: 推理知识
         status: planned
-        x: 930
+        x: 960
         y: 635
         posts: []
       - id: training
         title: 训练知识
         status: planned
-        x: 1105
+        x: 1135
         y: 645
         posts: []
 
