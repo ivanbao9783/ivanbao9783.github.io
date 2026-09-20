@@ -1,0 +1,64 @@
+{% assign map = site.data.starmap %}
+
+<div class="starmap-viewport" id="starmap">
+
+  <svg viewBox="0 0 1280 800" role="img" aria-label="LLM 与 Agent 评测知识星图" text-rendering="geometricPrecision">
+    {% comment %} 连线垫底 {% endcomment %}
+    {% for edge in map.edges %}
+      {% assign from_parts = edge.from | split: "." %}
+      {% assign to_parts = edge.to | split: "." %}
+      {% assign from_cluster_id = from_parts[0] %}
+      {% assign from_node_id = from_parts[1] %}
+      {% assign to_cluster_id = to_parts[0] %}
+      {% assign to_node_id = to_parts[1] %}
+      {% assign fc = map.clusters | where: "id", from_cluster_id | first %}
+      {% assign fn = fc.nodes | where: "id", from_node_id | first %}
+      {% assign tc = map.clusters | where: "id", to_cluster_id | first %}
+      {% assign tn = tc.nodes | where: "id", to_node_id | first %}
+      {% assign mx = fn.x | plus: tn.x | divided_by: 2 %}
+      {% assign my = fn.y | plus: tn.y | divided_by: 2 %}
+      <g class="starmap-edge starmap-edge-{{ edge.type }}">
+        <path d="M {{ fn.x }} {{ fn.y }} Q {{ mx }} {{ my | minus: 60 }} {{ tn.x }} {{ tn.y }}"></path>
+        <text x="{{ mx }}" y="{{ my | minus: 30 }}">{{ edge.label }}</text>
+      </g>
+    {% endfor %}
+
+    {% comment %} 星团边界与标题 {% endcomment %}
+    {% for cluster in map.clusters %}
+      <g class="starmap-cluster">
+        <ellipse cx="{{ cluster.ellipse.cx }}" cy="{{ cluster.ellipse.cy }}" rx="{{ cluster.ellipse.rx }}" ry="{{ cluster.ellipse.ry }}"></ellipse>
+        <text class="starmap-cluster-title" x="{{ cluster.ellipse.cx }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 24 }}">{{ cluster.title }}</text>
+      </g>
+    {% endfor %}
+
+    {% comment %} 节点（<a> 原生点击跳转，无需 JS） {% endcomment %}
+    {% for cluster in map.clusters %}
+      {% for node in cluster.nodes %}
+        {% assign r = node.posts.size | times: 6 | plus: 16 %}
+        {% if r > 40 %}{% assign r = 40 %}{% endif %}
+        {% if node.kind == "tool" %}{% assign r = 20 %}{% endif %}
+        {% if node.url %}
+          {% assign node_url = node.url %}
+        {% else %}
+          {% assign node_url = '/domains/' | append: cluster.id | append: '/' | append: node.id | append: '/' %}
+        {% endif %}
+        <a href="{{ node_url | relative_url }}"
+           class="starmap-node starmap-node-{{ node.status }}"
+           data-cluster="{{ cluster.title }}"
+           data-title="{{ node.title }}"
+           data-posts="{{ node.posts.size }}">
+          <circle cx="{{ node.x }}" cy="{{ node.y }}" r="{{ r }}"></circle>
+          <text x="{{ node.x }}" y="{{ node.y | plus: r | plus: 16 }}">{{ node.title }}</text>
+        </a>
+      {% endfor %}
+    {% endfor %}
+  </svg>
+
+  <div class="starmap-legend">
+    <span><i class="legend-dot legend-deep"></i>已深耕</span>
+    <span><i class="legend-dot legend-seeded"></i>有内容</span>
+    <span><i class="legend-dot legend-planned"></i>规划中</span>
+    <span>节点大小 = 博文数量 · 虚线椭圆 = 一级领域</span>
+  </div>
+
+</div>
