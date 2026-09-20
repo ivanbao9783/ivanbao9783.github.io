@@ -22,7 +22,7 @@ layout: default
     --planned-label: #8f96a3;
     --c-eval-system: #5b7fa6; --c-deep-eval-system: #3d5f87;
     --c-dataset: #4f8a78; --c-deep-dataset: #35695a;
-    --c-rubric: #b08450; --c-deep-rubric: #8a6236;
+    --c-scoring: #b08450; --c-deep-scoring: #8a6236;
     --c-edge: #8a7b9e; --c-deep-edge: #665879;
     position: relative;
     border: 1px solid rgba(120, 105, 70, 0.22);
@@ -42,7 +42,7 @@ layout: default
     --planned-label: #5d6f8a;
     --c-eval-system: #6f9cc9; --c-deep-eval-system: #3a5d85;
     --c-dataset: #5fa78f; --c-deep-dataset: #2f6152;
-    --c-rubric: #cf9a5c; --c-deep-rubric: #8a6236;
+    --c-scoring: #cf9a5c; --c-deep-scoring: #8a6236;
     --c-edge: #a293b8; --c-deep-edge: #5d5070;
     border-color: rgba(110, 150, 200, 0.25);
     box-shadow: 0 8px 28px rgba(2, 8, 20, 0.55), inset 0 0 0 1px rgba(140, 180, 230, 0.08);
@@ -74,9 +74,9 @@ layout: default
   #sm-aura-dataset .sm-aura-hi { stop-color: rgba(79, 138, 120, 0.15); }
   #sm-aura-dataset .sm-aura-mid { stop-color: rgba(79, 138, 120, 0.06); }
   #sm-aura-dataset .sm-aura-lo { stop-color: rgba(79, 138, 120, 0); }
-  #sm-aura-rubric .sm-aura-hi { stop-color: rgba(176, 132, 80, 0.16); }
-  #sm-aura-rubric .sm-aura-mid { stop-color: rgba(176, 132, 80, 0.07); }
-  #sm-aura-rubric .sm-aura-lo { stop-color: rgba(176, 132, 80, 0); }
+  #sm-aura-scoring .sm-aura-hi { stop-color: rgba(176, 132, 80, 0.16); }
+  #sm-aura-scoring .sm-aura-mid { stop-color: rgba(176, 132, 80, 0.07); }
+  #sm-aura-scoring .sm-aura-lo { stop-color: rgba(176, 132, 80, 0); }
   #sm-aura-edge .sm-aura-hi { stop-color: rgba(138, 123, 158, 0.14); }
   #sm-aura-edge .sm-aura-mid { stop-color: rgba(138, 123, 158, 0.06); }
   #sm-aura-edge .sm-aura-lo { stop-color: rgba(138, 123, 158, 0); }
@@ -84,8 +84,8 @@ layout: default
   .theme-space #sm-aura-eval-system .sm-aura-mid { stop-color: rgba(91, 127, 166, 0.10); }
   .theme-space #sm-aura-dataset .sm-aura-hi { stop-color: rgba(79, 138, 120, 0.26); }
   .theme-space #sm-aura-dataset .sm-aura-mid { stop-color: rgba(79, 138, 120, 0.10); }
-  .theme-space #sm-aura-rubric .sm-aura-hi { stop-color: rgba(176, 132, 80, 0.26); }
-  .theme-space #sm-aura-rubric .sm-aura-mid { stop-color: rgba(176, 132, 80, 0.10); }
+  .theme-space #sm-aura-scoring .sm-aura-hi { stop-color: rgba(176, 132, 80, 0.26); }
+  .theme-space #sm-aura-scoring .sm-aura-mid { stop-color: rgba(176, 132, 80, 0.10); }
   .theme-space #sm-aura-edge .sm-aura-hi { stop-color: rgba(138, 123, 158, 0.26); }
   .theme-space #sm-aura-edge .sm-aura-mid { stop-color: rgba(138, 123, 158, 0.10); }
 
@@ -96,9 +96,9 @@ layout: default
   #sm-orb-dataset .sm-orb-hi { stop-color: #eafaf4; }
   #sm-orb-dataset .sm-orb-mid { stop-color: #5fa78f; }
   #sm-orb-dataset .sm-orb-lo { stop-color: #2f6152; }
-  #sm-orb-rubric .sm-orb-hi { stop-color: #fdf3e3; }
-  #sm-orb-rubric .sm-orb-mid { stop-color: #cf9a5c; }
-  #sm-orb-rubric .sm-orb-lo { stop-color: #8a6236; }
+  #sm-orb-scoring .sm-orb-hi { stop-color: #fdf3e3; }
+  #sm-orb-scoring .sm-orb-mid { stop-color: #cf9a5c; }
+  #sm-orb-scoring .sm-orb-lo { stop-color: #8a6236; }
   #sm-orb-edge .sm-orb-hi { stop-color: #f3effa; }
   #sm-orb-edge .sm-orb-mid { stop-color: #a293b8; }
   #sm-orb-edge .sm-orb-lo { stop-color: #5d5070; }
@@ -117,9 +117,9 @@ layout: default
   .sm-cg-dataset .sm-label-paper { fill: #35695a; }
   .sm-cg-dataset .sm-label-space { fill: #5fa78f; }
   .sm-cg-dataset .sm-label-rule { stroke: #4f8a78; }
-  .sm-cg-rubric .sm-label-paper { fill: #8a6236; }
-  .sm-cg-rubric .sm-label-space { fill: #cf9a5c; }
-  .sm-cg-rubric .sm-label-rule { stroke: #b08450; }
+  .sm-cg-scoring .sm-label-paper { fill: #8a6236; }
+  .sm-cg-scoring .sm-label-space { fill: #cf9a5c; }
+  .sm-cg-scoring .sm-label-rule { stroke: #b08450; }
   .sm-cg-edge .sm-label-paper { fill: #665879; }
   .sm-cg-edge .sm-label-space { fill: #a293b8; }
   .sm-cg-edge .sm-label-rule { stroke: #8a7b9e; }
@@ -138,12 +138,12 @@ layout: default
   .starmap-node:hover .sm-node-core { stroke-width: 3; }
   .sm-c-eval-system .sm-node-core { fill: #5b7fa6; stroke: #3d5f87; }
   .sm-c-dataset .sm-node-core { fill: #4f8a78; stroke: #35695a; }
-  .sm-c-rubric .sm-node-core { fill: #b08450; stroke: #8a6236; }
+  .sm-c-scoring .sm-node-core { fill: #b08450; stroke: #8a6236; }
   .sm-c-edge .sm-node-core { fill: #8a7b9e; stroke: #665879; }
   .starmap-node-seeded .sm-node-core { opacity: 0.82; }
   .sm-c-eval-system.starmap-node-planned .sm-node-core { fill: rgba(91, 127, 166, 0.10); stroke: #5b7fa6; stroke-width: 1.4; stroke-dasharray: 3 3; }
   .sm-c-dataset.starmap-node-planned .sm-node-core { fill: rgba(79, 138, 120, 0.10); stroke: #4f8a78; stroke-width: 1.4; stroke-dasharray: 3 3; }
-  .sm-c-rubric.starmap-node-planned .sm-node-core { fill: rgba(176, 132, 80, 0.10); stroke: #b08450; stroke-width: 1.4; stroke-dasharray: 3 3; }
+  .sm-c-scoring.starmap-node-planned .sm-node-core { fill: rgba(176, 132, 80, 0.10); stroke: #b08450; stroke-width: 1.4; stroke-dasharray: 3 3; }
   .sm-c-edge.starmap-node-planned .sm-node-core { fill: rgba(138, 123, 158, 0.10); stroke: #8a7b9e; stroke-width: 1.4; stroke-dasharray: 3 3; }
   .starmap-node-tool .sm-node-core { fill: var(--map-bg); stroke-width: 1.8; }
   .sm-node-hl { fill: #ffffff; opacity: 0.3; }
@@ -154,12 +154,12 @@ layout: default
   /* ---- 节点：celestial 发光星体覆盖 ---- */
   .theme-space .sm-c-eval-system .sm-node-core { fill: url(#sm-orb-eval-system); stroke: none; }
   .theme-space .sm-c-dataset .sm-node-core { fill: url(#sm-orb-dataset); stroke: none; }
-  .theme-space .sm-c-rubric .sm-node-core { fill: url(#sm-orb-rubric); stroke: none; }
+  .theme-space .sm-c-scoring .sm-node-core { fill: url(#sm-orb-scoring); stroke: none; }
   .theme-space .sm-c-edge .sm-node-core { fill: url(#sm-orb-edge); stroke: none; }
   .theme-space .starmap-node-seeded .sm-node-core { opacity: 1; }
   .theme-space .sm-c-eval-system.starmap-node-planned .sm-node-core { fill: none; stroke: #6f9cc9; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
   .theme-space .sm-c-dataset.starmap-node-planned .sm-node-core { fill: none; stroke: #5fa78f; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
-  .theme-space .sm-c-rubric.starmap-node-planned .sm-node-core { fill: none; stroke: #cf9a5c; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
+  .theme-space .sm-c-scoring.starmap-node-planned .sm-node-core { fill: none; stroke: #cf9a5c; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
   .theme-space .sm-c-edge.starmap-node-planned .sm-node-core { fill: none; stroke: #a293b8; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
   .theme-space .starmap-node-tool .sm-node-core { fill: none; stroke: #6f9cc9; stroke-width: 2; }
   .theme-space .sm-c-eval-system .sm-tool-core { display: inline; fill: url(#sm-orb-eval-system); }

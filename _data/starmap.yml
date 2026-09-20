@@ -1,18 +1,19 @@
 # 知识星图 · 单一事实源
+# 流水线语义：数据集(考题/输入) → 评测系统(考场/harness) → 评分与诊断(判卷/下游) → 周边领域(知识补给)
 # status: deep(已深耕,≥2篇) | seeded(有内容,1篇) | planned(规划中,0篇)
 # kind: tool 的节点为「晋升的明星工具」，url 指向其 parent 的落地页
-theme_default: paper # paper(羊皮纸) | space(深空)
+theme_default: paper # paper(羊皮纸/atlas) | space(深空/celestial)
 
 clusters:
   - id: eval-system
     title: 评测系统
-    ellipse: { cx: 300, cy: 400, rx: 270, ry: 310 }
+    ellipse: { cx: 280, cy: 400, rx: 255, ry: 300 }
     nodes:
       - id: harness
         title: 评测框架
         status: deep
         x: 300
-        y: 250
+        y: 235
         posts:
           - 2026-07-15-agent-eval-harness.md
           - 2026-07-15-agent-eval-02-evalscope.md
@@ -23,45 +24,43 @@ clusters:
         parent: harness
         status: deep
         x: 455
-        y: 265
+        y: 250
         url: /domains/eval-system/harness/
         posts: []
       - id: paradigm
-        title: 评测范式演进
+        title: 评测范式
         status: deep
-        x: 165
-        y: 400
+        x: 150
+        y: 390
         posts:
           - 2026-07-15-agent-eval-01-paradigm-shift.md
           - 2026-07-15-agent-eval-04-ibm-clear.md
           - 2026-07-24-eval-system-llm-to-agent-judge.md
-      - id: observability
-        title: 可观测性
+      - id: hotspot
+        title: 评测热点
         status: seeded
-        x: 435
-        y: 415
-        posts:
-          - 2026-07-15-agent-eval-03-langfuse.md
-          - 2026-08-29-llm-response-anomaly-detection.md
-      - id: engineering
-        title: 评测工程化
-        status: seeded
-        x: 250
-        y: 545
+        x: 320
+        y: 470
         posts:
           - 2026-07-24-eval-hotspot-openai-hf-jailbreak.md
+      - id: engineering
+        title: 评测工程化
+        status: planned
+        x: 250
+        y: 555
+        posts: []
       - id: hardware
         title: 硬件评测
         status: seeded
-        x: 110
-        y: 585
+        x: 105
+        y: 580
         posts:
           - 2026-07-15-eval-system-aa-agentperf.md
       - id: performance
         title: 性能评测
         status: planned
         x: 380
-        y: 610
+        y: 625
         posts: []
   - id: dataset
     title: 数据集
@@ -82,42 +81,56 @@ clusters:
         y: 290
         posts:
           - 2026-08-19-eval-data-mini-data-compression.md
-  - id: rubric
-    title: Rubric
-    ellipse: { cx: 670, cy: 480, rx: 125, ry: 95 }
+  - id: scoring
+    title: 评分与诊断
+    ellipse: { cx: 700, cy: 505, rx: 160, ry: 145 }
     nodes:
       - id: metrics
-        title: Rubric 评判指标
+        title: Rubric 与指标设计
         status: planned
-        x: 670
-        y: 480
+        x: 700
+        y: 435
         posts: []
+      - id: observability
+        title: 可观测性
+        status: seeded
+        x: 630
+        y: 555
+        posts:
+          - 2026-07-15-agent-eval-03-langfuse.md
+      - id: anomaly
+        title: 异常检测
+        status: seeded
+        x: 775
+        y: 555
+        posts:
+          - 2026-08-29-llm-response-anomaly-detection.md
   - id: edge
-    title: 边缘领域
-    ellipse: { cx: 1010, cy: 520, rx: 235, ry: 225 }
+    title: 周边领域
+    ellipse: { cx: 1020, cy: 520, rx: 225, ry: 215 }
     nodes:
       - id: agent
         title: Agent 知识
         status: planned
-        x: 925
+        x: 935
         y: 420
         posts: []
       - id: model-arch
         title: 模型结构
         status: planned
-        x: 1090
-        y: 405
+        x: 1095
+        y: 410
         posts: []
       - id: inference
         title: 推理知识
         status: planned
-        x: 905
+        x: 915
         y: 600
         posts: []
       - id: training
         title: 训练知识
         status: planned
-        x: 1085
+        x: 1090
         y: 610
         posts: []
 
@@ -127,6 +140,6 @@ edges:
     type: cost
     label: 评测成本
   - from: eval-system.paradigm
-    to: rubric.metrics
+    to: scoring.metrics
     type: method
     label: 评判方法
