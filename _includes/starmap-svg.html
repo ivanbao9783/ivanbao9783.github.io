@@ -4,18 +4,18 @@
 
   <svg viewBox="0 0 1280 800" role="img" aria-label="LLM 与 Agent 评测知识星图" text-rendering="geometricPrecision">
     <defs>
-      <radialGradient id="sm-grad-deep" cx="35%" cy="30%" r="85%">
-        <stop offset="0%" class="sm-stop-hi"></stop>
-        <stop offset="100%" class="sm-stop-lo"></stop>
+      {% for cluster in map.clusters %}
+      <radialGradient id="sm-aura-{{ cluster.id }}" cx="50%" cy="50%" r="58%">
+        <stop offset="0%" class="sm-aura-hi"></stop>
+        <stop offset="70%" class="sm-aura-mid"></stop>
+        <stop offset="100%" class="sm-aura-lo"></stop>
       </radialGradient>
-      <radialGradient id="sm-grad-seeded" cx="35%" cy="30%" r="85%">
-        <stop offset="0%" class="sm-stop-hi"></stop>
-        <stop offset="100%" class="sm-stop-lo"></stop>
+      <radialGradient id="sm-orb-{{ cluster.id }}" cx="38%" cy="32%" r="80%">
+        <stop offset="0%" class="sm-orb-hi"></stop>
+        <stop offset="45%" class="sm-orb-mid"></stop>
+        <stop offset="100%" class="sm-orb-lo"></stop>
       </radialGradient>
-      <radialGradient id="sm-grad-planned" cx="35%" cy="30%" r="85%">
-        <stop offset="0%" class="sm-stop-hi"></stop>
-        <stop offset="100%" class="sm-stop-lo"></stop>
-      </radialGradient>
+      {% endfor %}
     </defs>
 
     {% comment %} 连线垫底 {% endcomment %}
@@ -38,11 +38,13 @@
       </g>
     {% endfor %}
 
-    {% comment %} 星团边界与标题 {% endcomment %}
+    {% comment %} 星团：专属色晕 + 双主题标签 {% endcomment %}
     {% for cluster in map.clusters %}
-      <g class="starmap-cluster starmap-cluster-{{ cluster.id }}">
-        <ellipse cx="{{ cluster.ellipse.cx }}" cy="{{ cluster.ellipse.cy }}" rx="{{ cluster.ellipse.rx }}" ry="{{ cluster.ellipse.ry }}"></ellipse>
-        <text class="starmap-cluster-title" x="{{ cluster.ellipse.cx }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 24 }}">{{ cluster.title }}</text>
+      <g class="starmap-cluster sm-cg-{{ cluster.id }}">
+        <ellipse class="sm-aura" cx="{{ cluster.ellipse.cx }}" cy="{{ cluster.ellipse.cy }}" rx="{{ cluster.ellipse.rx }}" ry="{{ cluster.ellipse.ry }}" fill="url(#sm-aura-{{ cluster.id }})"></ellipse>
+        <text class="sm-cluster-label sm-label-paper" x="{{ cluster.ellipse.cx | minus: cluster.ellipse.rx | plus: 12 }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 28 }}">{{ cluster.title }}</text>
+        <line class="sm-label-rule" x1="{{ cluster.ellipse.cx | minus: cluster.ellipse.rx | plus: 12 }}" y1="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 38 }}" x2="{{ cluster.ellipse.cx | minus: cluster.ellipse.rx | plus: 64 }}" y2="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 38 }}"></line>
+        <text class="sm-cluster-label sm-label-space" x="{{ cluster.ellipse.cx }}" y="{{ cluster.ellipse.cy | minus: cluster.ellipse.ry | plus: 30 }}">{{ cluster.title }}</text>
       </g>
     {% endfor %}
 
@@ -52,17 +54,27 @@
         {% assign r = node.posts.size | times: 6 | plus: 16 %}
         {% if r > 40 %}{% assign r = 40 %}{% endif %}
         {% if node.kind == "tool" %}{% assign r = 20 %}{% endif %}
+        {% assign glow_r = r | times: 1.9 %}
+        {% assign tool_r = r | times: 0.45 %}
+        {% assign hl_r = r | times: 0.18 %}
+        {% assign hl_dx = r | times: 0.3 %}
+        {% assign hl_dy = r | times: 0.32 %}
+        {% assign hl_cx = node.x | minus: hl_dx %}
+        {% assign hl_cy = node.y | minus: hl_dy %}
         {% if node.url %}
           {% assign node_url = node.url %}
         {% else %}
           {% assign node_url = '/domains/' | append: cluster.id | append: '/' | append: node.id | append: '/' %}
         {% endif %}
         <a href="{{ node_url | relative_url }}"
-           class="starmap-node starmap-node-{{ node.status }}{% if node.kind == 'tool' %} starmap-node-tool{% endif %}"
+           class="starmap-node starmap-node-{{ node.status }} sm-c-{{ cluster.id }}{% if node.kind == 'tool' %} starmap-node-tool{% endif %}"
            data-cluster="{{ cluster.title }}"
            data-title="{{ node.title }}"
            data-posts="{{ node.posts.size }}">
-          <circle cx="{{ node.x }}" cy="{{ node.y }}" r="{{ r }}" fill="url(#sm-grad-{{ node.status }})"></circle>
+          <circle class="sm-node-glow" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ glow_r }}" fill="url(#sm-aura-{{ cluster.id }})"></circle>
+          <circle class="sm-node-core" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ r }}"></circle>
+          {% if node.kind == "tool" %}<circle class="sm-tool-core" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ tool_r }}"></circle>{% endif %}
+          <circle class="sm-node-hl" cx="{{ hl_cx }}" cy="{{ hl_cy }}" r="{{ hl_r }}"></circle>
           <text x="{{ node.x }}" y="{{ node.y | plus: r | plus: 16 }}">{{ node.title }}</text>
         </a>
       {% endfor %}
@@ -73,7 +85,7 @@
     <span><i class="legend-dot legend-deep"></i>已深耕</span>
     <span><i class="legend-dot legend-seeded"></i>有内容</span>
     <span><i class="legend-dot legend-planned"></i>规划中</span>
-    <span>节点大小 = 博文数量 · 虚线椭圆 = 一级领域</span>
+    <span>节点大小 = 博文数量 · 色晕 = 一级领域</span>
   </div>
 
 </div>

@@ -4,7 +4,7 @@ layout: default
 {% include lang.html %}
 
 <style>
-  /* ---- 页头：融入站点排版（使用站点变量，自动适配明暗模式） ---- */
+  /* ---- 页头：融入站点排版 ---- */
   .starmap-article { margin: 0 auto; }
   .starmap-header { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; padding: 0.25rem 0.25rem 1.25rem; }
   .starmap-header h1 { font-size: 1.6rem; margin: 0; color: var(--heading-color, #2c3e50); }
@@ -12,83 +12,168 @@ layout: default
   .starmap-theme-toggle { border: 1px solid var(--btn-border-color, #adb5bd); background: transparent; color: var(--text-color, #333); border-radius: 2rem; padding: 0.22rem 0.9rem; cursor: pointer; font-size: 0.85rem; transition: border-color 0.2s ease; }
   .starmap-theme-toggle:hover { border-color: var(--btn-border-hover-color, #495057); }
 
-  /* ---- 画布：羊皮纸 paper / 深空 space 双主题令牌 ---- */
+  /* ---- 画布：atlas(默认) / celestial(换肤) 双主题 ---- */
   .starmap-canvas {
-    --map-bg: #f6f1e4;
-    --map-dot: #d9d1bc;
-    --cluster-stroke: #8a97ab;
-    --cluster-title: #31435c;
-    --node-stroke: #3d6288;
-    --node-label: #33435a;
-    --edge-stroke: #97a0b3;
-    --edge-label: #75808f;
-    --grad-hi: #8fb6d8;
-    --grad-lo: #4e7ca6;
+    --map-bg: #fbf9f4;
+    --map-dot: #e7e0d2;
+    --edge-stroke: #b9b2a4;
+    --edge-label: #8a8375;
+    --node-label: #3d4657;
+    --planned-label: #8f96a3;
+    --c-eval-system: #5b7fa6; --c-deep-eval-system: #3d5f87;
+    --c-dataset: #4f8a78; --c-deep-dataset: #35695a;
+    --c-rubric: #b08450; --c-deep-rubric: #8a6236;
+    --c-edge: #8a7b9e; --c-deep-edge: #665879;
     position: relative;
-    border: 1px solid rgba(120, 105, 70, 0.25);
+    border: 1px solid rgba(120, 105, 70, 0.22);
     border-radius: 0.85rem;
-    box-shadow: 0 6px 24px rgba(59, 47, 20, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 24px rgba(59, 47, 20, 0.07), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
     background-color: var(--map-bg);
-    background-image:
-      radial-gradient(130% 130% at 50% 45%, transparent 58%, rgba(146, 112, 60, 0.10) 100%),
-      radial-gradient(var(--map-dot) 1px, transparent 1.4px);
-    background-size: 100% 100%, 24px 24px;
+    background-image: radial-gradient(var(--map-dot) 1px, transparent 1.4px);
+    background-size: 26px 26px;
     padding: 1.1rem 1.4rem 1.2rem;
   }
   .starmap-canvas.theme-space {
-    --map-bg: #0a1524;
+    --map-bg: #0a101e;
     --map-dot: #24395a;
-    --cluster-stroke: #35516f;
-    --cluster-title: #cfe4f5;
-    --node-stroke: #b7ddf5;
-    --node-label: #d5e6f5;
-    --edge-stroke: #45607e;
-    --edge-label: #64809f;
-    --grad-hi: #bcdfff;
-    --grad-lo: #3c7fb8;
-    border-color: rgba(110, 150, 200, 0.28);
+    --edge-stroke: #3d5a7a;
+    --edge-label: #7a95b5;
+    --node-label: #d7e4f2;
+    --planned-label: #5d6f8a;
+    --c-eval-system: #6f9cc9; --c-deep-eval-system: #3a5d85;
+    --c-dataset: #5fa78f; --c-deep-dataset: #2f6152;
+    --c-rubric: #cf9a5c; --c-deep-rubric: #8a6236;
+    --c-edge: #a293b8; --c-deep-edge: #5d5070;
+    border-color: rgba(110, 150, 200, 0.25);
     box-shadow: 0 8px 28px rgba(2, 8, 20, 0.55), inset 0 0 0 1px rgba(140, 180, 230, 0.08);
     background-image:
       radial-gradient(90% 70% at 18% 12%, rgba(70, 115, 190, 0.16), transparent 60%),
-      radial-gradient(85% 65% at 82% 88%, rgba(130, 90, 190, 0.12), transparent 55%),
+      radial-gradient(85% 65% at 82% 88%, rgba(130, 90, 190, 0.13), transparent 55%),
+      radial-gradient(circle at 12% 26%, rgba(207, 224, 245, 0.6) 0.8px, transparent 1.6px),
+      radial-gradient(circle at 34% 9%, rgba(207, 224, 245, 0.4) 0.7px, transparent 1.5px),
+      radial-gradient(circle at 57% 74%, rgba(207, 224, 245, 0.5) 0.8px, transparent 1.6px),
+      radial-gradient(circle at 71% 38%, rgba(207, 224, 245, 0.35) 0.7px, transparent 1.5px),
+      radial-gradient(circle at 88% 63%, rgba(207, 224, 245, 0.55) 0.9px, transparent 1.8px),
+      radial-gradient(circle at 44% 45%, rgba(207, 224, 245, 0.3) 0.6px, transparent 1.4px),
+      radial-gradient(circle at 5% 82%, rgba(207, 224, 245, 0.45) 0.8px, transparent 1.6px),
+      radial-gradient(circle at 93% 16%, rgba(207, 224, 245, 0.4) 0.7px, transparent 1.5px),
+      radial-gradient(circle at 66% 92%, rgba(207, 224, 245, 0.5) 0.8px, transparent 1.6px),
+      radial-gradient(circle at 22% 58%, rgba(207, 224, 245, 0.3) 0.6px, transparent 1.4px),
       radial-gradient(var(--map-dot) 1px, transparent 1.4px);
-    background-size: 100% 100%, 100% 100%, 26px 26px;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 26px 26px;
   }
 
-  /* ---- SVG ---- */
+  /* ---- SVG 基础 ---- */
   .starmap-viewport svg { width: 100%; height: auto; display: block; }
-  .starmap-viewport text { font-family: Georgia, "Times New Roman", "Songti SC", SimSun, serif; }
-  .sm-stop-hi { stop-color: var(--grad-hi); }
-  .sm-stop-lo { stop-color: var(--grad-lo); }
+  .starmap-viewport text { font-family: system-ui, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
 
-  .starmap-cluster ellipse { fill: none; stroke: var(--cluster-stroke); stroke-width: 1.2; stroke-dasharray: 3 7; stroke-linecap: round; }
-  .starmap-cluster-eval-system ellipse { fill: rgba(80, 112, 152, 0.05); }
-  .starmap-cluster-dataset ellipse { fill: rgba(72, 128, 116, 0.05); }
-  .starmap-cluster-rubric ellipse { fill: rgba(152, 112, 62, 0.055); }
-  .starmap-cluster-edge ellipse { fill: rgba(122, 102, 142, 0.045); }
-  .starmap-cluster-title { font-size: 21px; font-weight: 700; fill: var(--cluster-title); letter-spacing: 0.3em; paint-order: stroke; stroke: var(--map-bg); stroke-width: 4px; stroke-linejoin: round; }
+  /* ---- 星团色晕渐变（atlas 透明度） ---- */
+  #sm-aura-eval-system .sm-aura-hi { stop-color: rgba(91, 127, 166, 0.15); }
+  #sm-aura-eval-system .sm-aura-mid { stop-color: rgba(91, 127, 166, 0.06); }
+  #sm-aura-eval-system .sm-aura-lo { stop-color: rgba(91, 127, 166, 0); }
+  #sm-aura-dataset .sm-aura-hi { stop-color: rgba(79, 138, 120, 0.15); }
+  #sm-aura-dataset .sm-aura-mid { stop-color: rgba(79, 138, 120, 0.06); }
+  #sm-aura-dataset .sm-aura-lo { stop-color: rgba(79, 138, 120, 0); }
+  #sm-aura-rubric .sm-aura-hi { stop-color: rgba(176, 132, 80, 0.16); }
+  #sm-aura-rubric .sm-aura-mid { stop-color: rgba(176, 132, 80, 0.07); }
+  #sm-aura-rubric .sm-aura-lo { stop-color: rgba(176, 132, 80, 0); }
+  #sm-aura-edge .sm-aura-hi { stop-color: rgba(138, 123, 158, 0.14); }
+  #sm-aura-edge .sm-aura-mid { stop-color: rgba(138, 123, 158, 0.06); }
+  #sm-aura-edge .sm-aura-lo { stop-color: rgba(138, 123, 158, 0); }
+  .theme-space #sm-aura-eval-system .sm-aura-hi { stop-color: rgba(91, 127, 166, 0.26); }
+  .theme-space #sm-aura-eval-system .sm-aura-mid { stop-color: rgba(91, 127, 166, 0.10); }
+  .theme-space #sm-aura-dataset .sm-aura-hi { stop-color: rgba(79, 138, 120, 0.26); }
+  .theme-space #sm-aura-dataset .sm-aura-mid { stop-color: rgba(79, 138, 120, 0.10); }
+  .theme-space #sm-aura-rubric .sm-aura-hi { stop-color: rgba(176, 132, 80, 0.26); }
+  .theme-space #sm-aura-rubric .sm-aura-mid { stop-color: rgba(176, 132, 80, 0.10); }
+  .theme-space #sm-aura-edge .sm-aura-hi { stop-color: rgba(138, 123, 158, 0.26); }
+  .theme-space #sm-aura-edge .sm-aura-mid { stop-color: rgba(138, 123, 158, 0.10); }
 
+  /* ---- 发光星体渐变（celestial 节点填充） ---- */
+  #sm-orb-eval-system .sm-orb-hi { stop-color: #eaf4ff; }
+  #sm-orb-eval-system .sm-orb-mid { stop-color: #6f9cc9; }
+  #sm-orb-eval-system .sm-orb-lo { stop-color: #3a5d85; }
+  #sm-orb-dataset .sm-orb-hi { stop-color: #eafaf4; }
+  #sm-orb-dataset .sm-orb-mid { stop-color: #5fa78f; }
+  #sm-orb-dataset .sm-orb-lo { stop-color: #2f6152; }
+  #sm-orb-rubric .sm-orb-hi { stop-color: #fdf3e3; }
+  #sm-orb-rubric .sm-orb-mid { stop-color: #cf9a5c; }
+  #sm-orb-rubric .sm-orb-lo { stop-color: #8a6236; }
+  #sm-orb-edge .sm-orb-hi { stop-color: #f3effa; }
+  #sm-orb-edge .sm-orb-mid { stop-color: #a293b8; }
+  #sm-orb-edge .sm-orb-lo { stop-color: #5d5070; }
+
+  /* ---- 星团标题：atlas 左上图例式 / celestial 顶部居中 ---- */
+  .sm-cluster-label { font-weight: 600; }
+  .sm-label-paper { font-size: 13px; letter-spacing: 4px; }
+  .sm-label-space { display: none; font-size: 14px; letter-spacing: 6px; text-anchor: middle; }
+  .theme-space .sm-label-paper { display: none; }
+  .theme-space .sm-label-space { display: inline; }
+  .sm-label-rule { stroke-width: 2; stroke-linecap: round; opacity: 0.55; }
+  .theme-space .sm-label-rule { display: none; }
+  .sm-cg-eval-system .sm-label-paper { fill: #3d5f87; }
+  .sm-cg-eval-system .sm-label-space { fill: #6f9cc9; }
+  .sm-cg-eval-system .sm-label-rule { stroke: #5b7fa6; }
+  .sm-cg-dataset .sm-label-paper { fill: #35695a; }
+  .sm-cg-dataset .sm-label-space { fill: #5fa78f; }
+  .sm-cg-dataset .sm-label-rule { stroke: #4f8a78; }
+  .sm-cg-rubric .sm-label-paper { fill: #8a6236; }
+  .sm-cg-rubric .sm-label-space { fill: #cf9a5c; }
+  .sm-cg-rubric .sm-label-rule { stroke: #b08450; }
+  .sm-cg-edge .sm-label-paper { fill: #665879; }
+  .sm-cg-edge .sm-label-space { fill: #a293b8; }
+  .sm-cg-edge .sm-label-rule { stroke: #8a7b9e; }
+
+  /* ---- 连线 ---- */
+  .starmap-edge path { fill: none; stroke: var(--edge-stroke); stroke-width: 1.2; }
+  .starmap-edge text { fill: var(--edge-label); font-size: 11px; text-anchor: middle; letter-spacing: 0.1em; paint-order: stroke; stroke: var(--map-bg); stroke-width: 3.5px; stroke-linejoin: round; }
+
+  /* ---- 节点：atlas 实色圆+高光 ---- */
   .starmap-node { cursor: pointer; text-decoration: none; }
-  .starmap-node circle { stroke: var(--node-stroke); stroke-width: 2; transition: stroke-width 0.15s ease; }
-  .starmap-node text { fill: var(--node-label); font-size: 13.5px; text-anchor: middle; paint-order: stroke; stroke: var(--map-bg); stroke-width: 3px; stroke-linejoin: round; }
-  .starmap-node:hover circle { stroke-width: 3.6; }
-  .starmap-node-deep circle { opacity: 1; }
-  .starmap-node-seeded circle { opacity: 0.92; }
-  .starmap-node-planned circle { opacity: 0.5; stroke-dasharray: 4 3; stroke-width: 1.5; }
-  .starmap-node-tool circle { fill: var(--map-bg); stroke-width: 2.5; }
-  .starmap-node-tool text { font-size: 12px; font-style: italic; }
-  .theme-space .starmap-node circle { filter: drop-shadow(0 0 6px rgba(120, 185, 240, 0.45)); }
-  .theme-space .starmap-node-planned circle { filter: drop-shadow(0 0 3px rgba(120, 185, 240, 0.25)); }
+  .starmap-node text { fill: var(--node-label); font-size: 13px; text-anchor: middle; paint-order: stroke; stroke: var(--map-bg); stroke-width: 3px; stroke-linejoin: round; }
+  .starmap-node:hover text { font-weight: 700; }
+  .starmap-node-planned text { fill: var(--planned-label); font-size: 12.5px; }
+  .starmap-node-tool text { font-size: 11.5px; font-style: italic; }
+  .sm-node-core { stroke-width: 1.6; transition: stroke-width 0.15s ease; }
+  .starmap-node:hover .sm-node-core { stroke-width: 3; }
+  .sm-c-eval-system .sm-node-core { fill: #5b7fa6; stroke: #3d5f87; }
+  .sm-c-dataset .sm-node-core { fill: #4f8a78; stroke: #35695a; }
+  .sm-c-rubric .sm-node-core { fill: #b08450; stroke: #8a6236; }
+  .sm-c-edge .sm-node-core { fill: #8a7b9e; stroke: #665879; }
+  .starmap-node-seeded .sm-node-core { opacity: 0.82; }
+  .sm-c-eval-system.starmap-node-planned .sm-node-core { fill: rgba(91, 127, 166, 0.10); stroke: #5b7fa6; stroke-width: 1.4; stroke-dasharray: 3 3; }
+  .sm-c-dataset.starmap-node-planned .sm-node-core { fill: rgba(79, 138, 120, 0.10); stroke: #4f8a78; stroke-width: 1.4; stroke-dasharray: 3 3; }
+  .sm-c-rubric.starmap-node-planned .sm-node-core { fill: rgba(176, 132, 80, 0.10); stroke: #b08450; stroke-width: 1.4; stroke-dasharray: 3 3; }
+  .sm-c-edge.starmap-node-planned .sm-node-core { fill: rgba(138, 123, 158, 0.10); stroke: #8a7b9e; stroke-width: 1.4; stroke-dasharray: 3 3; }
+  .starmap-node-tool .sm-node-core { fill: var(--map-bg); stroke-width: 1.8; }
+  .sm-node-hl { fill: #ffffff; opacity: 0.3; }
+  .starmap-node-planned .sm-node-hl, .starmap-node-tool .sm-node-hl { display: none; }
+  .sm-node-glow { display: none; }
+  .sm-tool-core { display: none; }
 
-  .starmap-edge path { fill: none; stroke: var(--edge-stroke); stroke-width: 1.6; stroke-dasharray: 1 5.5; stroke-linecap: round; }
-  .starmap-edge text { fill: var(--edge-label); font-size: 11.5px; text-anchor: middle; letter-spacing: 0.1em; paint-order: stroke; stroke: var(--map-bg); stroke-width: 3.5px; stroke-linejoin: round; }
+  /* ---- 节点：celestial 发光星体覆盖 ---- */
+  .theme-space .sm-c-eval-system .sm-node-core { fill: url(#sm-orb-eval-system); stroke: none; }
+  .theme-space .sm-c-dataset .sm-node-core { fill: url(#sm-orb-dataset); stroke: none; }
+  .theme-space .sm-c-rubric .sm-node-core { fill: url(#sm-orb-rubric); stroke: none; }
+  .theme-space .sm-c-edge .sm-node-core { fill: url(#sm-orb-edge); stroke: none; }
+  .theme-space .starmap-node-seeded .sm-node-core { opacity: 1; }
+  .theme-space .sm-c-eval-system.starmap-node-planned .sm-node-core { fill: none; stroke: #6f9cc9; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
+  .theme-space .sm-c-dataset.starmap-node-planned .sm-node-core { fill: none; stroke: #5fa78f; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
+  .theme-space .sm-c-rubric.starmap-node-planned .sm-node-core { fill: none; stroke: #cf9a5c; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
+  .theme-space .sm-c-edge.starmap-node-planned .sm-node-core { fill: none; stroke: #a293b8; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
+  .theme-space .starmap-node-tool .sm-node-core { fill: none; stroke: #6f9cc9; stroke-width: 2; }
+  .theme-space .sm-c-eval-system .sm-tool-core { display: inline; fill: url(#sm-orb-eval-system); }
+  .theme-space .sm-node-hl { display: none; }
+  .theme-space .sm-node-glow { display: inline; opacity: 0.75; }
+  .theme-space .starmap-node:hover .sm-node-glow { opacity: 1; }
+  .theme-space .starmap-node-planned .sm-node-glow { display: none; }
 
   /* ---- 图例与 tooltip ---- */
   .starmap-legend { display: flex; gap: 1.1rem 1.4rem; flex-wrap: wrap; align-items: center; font-size: 0.85rem; color: var(--edge-label); border-top: 1px dashed var(--map-dot); margin-top: 1rem; padding-top: 0.8rem; }
-  .legend-dot { display: inline-block; width: 13px; height: 13px; border-radius: 50%; margin-right: 0.4rem; vertical-align: -1.5px; background: linear-gradient(135deg, var(--grad-hi), var(--grad-lo)); border: 2px solid var(--node-stroke); }
-  .legend-deep { opacity: 1; }
-  .legend-seeded { opacity: 0.92; }
-  .legend-planned { opacity: 0.5; border-style: dashed; }
+  .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 0.4rem; vertical-align: -1.5px; }
+  .legend-deep { background: #5b7fa6; }
+  .legend-seeded { background: #5b7fa6; opacity: 0.82; }
+  .legend-planned { background: transparent; border: 1.5px dashed #8a94a8; }
   .starmap-tooltip { position: fixed; pointer-events: none; background: rgba(35, 48, 66, 0.92); color: #f2f6fa; border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.38rem 0.75rem; border-radius: 0.45rem; font-size: 0.85rem; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); z-index: 1000; display: none; }
 </style>
 
@@ -96,7 +181,7 @@ layout: default
   <header class="starmap-header">
     <h1>LLM &amp; Agent 评测知识星图</h1>
     <p>ivanbao 的领域学习全景 · 点击节点进入领域页</p>
-    <button id="starmap-theme-toggle" class="starmap-theme-toggle" type="button" title="切换 羊皮纸/深空 主题">🌗 换肤</button>
+    <button id="starmap-theme-toggle" class="starmap-theme-toggle" type="button" title="切换 地图志/深空 主题">🌗 换肤</button>
   </header>
 
   <div class="starmap-canvas theme-{{ site.data.starmap.theme_default | default: 'paper' }}" id="starmap-page">
