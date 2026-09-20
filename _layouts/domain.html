@@ -1,0 +1,51 @@
+---
+layout: default
+---
+{% include lang.html %}
+{% assign map = site.data.starmap %}
+{% assign cluster = map.clusters | where: "id", page.cluster | first %}
+{% assign node = cluster.nodes | where: "id", page.node | first %}
+{% assign node_posts = site.posts | where_exp: "p", "node.posts contains p.name" %}
+
+<article class="domain-page">
+
+  <nav class="domain-breadcrumb" style="font-size:0.9rem;color:#6c757d;padding:0.5rem 0 1rem;">
+    <a href="{{ '/' | relative_url }}">知识星图</a> / {{ cluster.title }} / <strong>{{ page.title }}</strong>
+    <a href="{{ '/' | relative_url }}" style="float:right;">← 返回星图</a>
+  </nav>
+
+  <header>
+    <h1>{{ page.title }}</h1>
+    <p style="color:#6c757d;font-size:0.9rem;">
+      {{ node.posts | size }} 篇博文 ·
+      {% if page.curated %}已整理{% else %}<span style="background:#fff3cd;color:#856404;padding:0.1rem 0.5rem;border-radius:0.25rem;font-size:0.8rem;">整理中</span>{% endif %}
+    </p>
+  </header>
+
+  {% unless page.curated %}
+  <blockquote style="border-left:4px solid #d8bd7f;background:#fdf9ef;padding:0.75rem 1rem;border-radius:0 0.4rem 0.4rem 0;">
+    该领域还在整理中——当前为自动聚合视图，后续会补充概述、核心概念与学习路径。
+  </blockquote>
+  {% endunless %}
+
+  <div class="content">
+    {{ content }}
+  </div>
+
+  <section class="domain-posts" style="margin-top:2.5rem;">
+    <h2>相关博文</h2>
+    {% if node_posts.size > 0 %}
+    <ul style="list-style:none;padding-left:0;">
+      {% for post in node_posts %}
+      <li style="padding:0.5rem 0;border-bottom:1px solid #eee;">
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        <time style="color:#adb5bd;font-size:0.85rem;">· {{ post.date | date: "%Y-%m-%d" }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color:#6c757d;">暂无博文，规划中。</p>
+    {% endif %}
+  </section>
+
+</article>
