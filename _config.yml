@@ -179,6 +179,8 @@ collections:
   tabs:
     output: true
     sort_by: order
+  domains:
+    output: true
 
 defaults:
   - scope:
@@ -201,6 +203,13 @@ defaults:
     values:
       layout: page
       permalink: /:title/
+  - scope:
+      path: ""
+      type: domains
+    values:
+      layout: domain
+      permalink: /domains/:path/
+      curated: false
 
 sass:
   style: compressed
