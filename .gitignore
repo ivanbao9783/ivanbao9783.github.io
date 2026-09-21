@@ -33,3 +33,6 @@ Thumbs.db
 
 # Brainstorm visual companion
 .superpowers/
+
+# Agent temporary workspace
+tmp_workspace/
