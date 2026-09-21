@@ -37,7 +37,7 @@ mermaid: true
 
 数据从左到右流过四个阶段：两条并行的变换线，汇入三类检测：
 
-![数据变换链路：原始输入长什么样，经过哪些关键转换，变成了什么](/assets/img/response-anomaly-data-pipeline.png)
+![数据变换链路：原始输入长什么样，经过哪些关键转换，变成了什么](/assets/img/llm-response-anomaly/response-anomaly-data-pipeline.png)
 
 ---
 
@@ -53,7 +53,7 @@ mermaid: true
 - 正常情况下，骰子高度偏向几个合理选项——生成"是"的概率可能高达 90%。
 - 一旦模型内部出了故障（量化误差、算子 bug），骰子就会突然变均匀：前 5 名候选加起来不到 0.4，而且这 5 个候选竟然来自汉字、希腊字母、符号、英文四个互不相干的家族。
 
-![正常与异常的生成分布对比：检测的是骰子，不是字](/assets/img/response-anomaly-dice.png)
+![正常与异常的生成分布对比：检测的是骰子，不是字](/assets/img/llm-response-anomaly/response-anomaly-dice.png)
 
 判定是个两步漏斗，用一个例子走一遍：
 
@@ -153,7 +153,7 @@ id 275     "the"  logprob -4.2   → 家族：英文
 
 核心思想就是：**在一个窗口内，高密度的"生僻字"就代表"乱码"出现。**
 
-![同一个信号，两种浓度：稀疏分布是生僻字，连成一片是乱码](/assets/img/response-anomaly-density.png)
+![同一个信号，两种浓度：稀疏分布是生僻字，连成一片是乱码](/assets/img/llm-response-anomaly/response-anomaly-density.png)
 
 它不另起炉灶，直接把生僻字检测当子程序调用，自己只加一个密度门槛：
 
@@ -172,7 +172,7 @@ id 275     "the"  logprob -4.2   → 家族：英文
 
 故障不会自愈，继续扫是白烧算力——所以乱码**1 个窗口就急停**。
 
-![孤立命中各有成因，连片命中只能是分布坏了：20% 密度门槛的由来](/assets/img/response-anomaly-threshold.png)
+![孤立命中各有成因，连片命中只能是分布坏了：20% 密度门槛的由来](/assets/img/llm-response-anomaly/response-anomaly-threshold.png)
 
 ---
 
@@ -205,7 +205,7 @@ id 275     "the"  logprob -4.2   → 家族：英文
 | 歌词副歌 "一句副歌"×32 | 复用有限几种 | 值偏低，但通常 > 阈值 | 放行 |
 | 复读机 "哈哈哈嗝"×32 | 只有 4 种 | 4/126 ≈ 0.03 | **检出** |
 
-![distinct-3：健康文本 3-gram 全不同，复读机只有 4 种 3-gram](/assets/img/response-anomaly-distinctn.png)
+![distinct-3：健康文本 3-gram 全不同，复读机只有 4 种 3-gram](/assets/img/llm-response-anomaly/response-anomaly-distinctn.png)
 
 ### 算法 2：ACF — 看"周期"
 
@@ -225,7 +225,7 @@ ACF(k=4):  每次平移 4 格都完美对齐 → 峰值 ~0.97  (阈值 0.65)
 ACF(k=3):  对不齐 → 值低
 ```
 
-![ACF：top1 概率序列周期 4 起伏，平移 k=4 完美对齐得高分](/assets/img/response-anomaly-acf.png)
+![ACF：top1 概率序列周期 4 起伏，平移 k=4 完美对齐得高分](/assets/img/llm-response-anomaly/response-anomaly-acf.png)
 
 ### 三道防线
 

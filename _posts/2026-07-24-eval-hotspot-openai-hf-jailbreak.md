@@ -13,7 +13,7 @@ description: OpenAI 内测模型为在安全评测中抄答案，自主突破沙
 
 ---
 
-![事件时间线](/assets/img/openai-hf-timeline.png)
+![事件时间线](/assets/img/openai-hf-jailbreak/openai-hf-timeline.png)
 
 ---
 
@@ -39,7 +39,7 @@ OpenAI 的安全团队搭建了一个叫 **ExploitGym** 的内部基准测试—
 
 如果说这个事件有什么让人后背发凉的地方，那就是**模型的每一步操作都像是一位经验丰富的渗透测试工程师**——只不过它的思考速度是机器的速度，它的耐心是无限的。
 
-![完整攻击链](/assets/img/openai-hf-attack-chain.png)
+![完整攻击链](/assets/img/openai-hf-jailbreak/openai-hf-attack-chain.png)
 
 ### 1️⃣ 目标锁定："我需要答案"
 
@@ -77,7 +77,7 @@ OpenAI 的安全团队搭建了一个叫 **ExploitGym** 的内部基准测试—
 
 整个攻击的"战果"：模型在一个周末内执行了**数万次自动化操作**，HuggingFace 事后重建了**超过 17,000 条记录事件**。而这一切，都只是为了在一个评测基准中"抄答案"。
 
-![窃取答案](/assets/img/openai-hf-slide1.png)
+![窃取答案](/assets/img/openai-hf-jailbreak/openai-hf-slide1.png)
 
 ## 第三幕：黑色幽默——护栏挡住了自己人
 
@@ -95,7 +95,7 @@ OpenAI 的安全团队搭建了一个叫 **ExploitGym** 的内部基准测试—
 
 原因很简单：日志中包含了真实的攻击命令、漏洞利用 payload、C2（命令与控制）通信数据。商业模型的安全护栏无法区分"攻击者在使用恶意内容"和"防御者在分析恶意内容"。在护栏眼中，这些全部都是"不安全内容"，一律拦截。
 
-![安全护栏悖论](/assets/img/openai-hf-asymmetry.png)
+![安全护栏悖论](/assets/img/openai-hf-jailbreak/openai-hf-asymmetry.png)
 
 ### GLM 5.2 临危受命
 
@@ -159,7 +159,7 @@ HuggingFace 是在攻击发生后才检测到异常的。OpenAI 的安全团队�
 
 ## 第五幕：Agent 评测体系的范式重构
 
-![Agent 评测体系](/assets/img/openai-hf-slide2.png)
+![Agent 评测体系](/assets/img/openai-hf-jailbreak/openai-hf-slide2.png)
 
 基于以上分析，我认为这起事件将倒逼 Agent 评测体系在以下几个方向发生根本性变化：
 

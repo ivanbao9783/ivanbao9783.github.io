@@ -31,7 +31,7 @@ description: AutomationBench 深度拆解——零容器的内存世界、终局
 | 官方指标 | `task_completed_correctly`——所有断言全过才得 1 分，严格通过率 |
 | 当前水平 | 最强模型约 50%，run-to-run 方差 <1% |
 
-![官方首页四数字区](/assets/img/automation_01_summary_num.png)
+![官方首页四数字区](/assets/img/automation-bench/automation_01_summary_num.png)
 
 *官方 benchmark 首屏：600+ 评测任务、6 个业务领域、47 个模拟应用、~500 个 API 端点*
 
@@ -40,7 +40,7 @@ description: AutomationBench 深度拆解——零容器的内存世界、终局
 1. **榜单跑在私有 held-out 集上**，公开的 600 题是给社区研究用的（另有 200 道 simple 题不计分）；
 2. 官方唯一计分口径是 `task_completed_correctly`，另一个 `partial_credit`（断言通过比例）只做诊断和训练信号——**部分做对不加分，榜单只认"全对"**。
 
-![官方 leaderboard 榜单](/assets/img/automation_00_leardboard.png)
+![官方 leaderboard 榜单](/assets/img/automation-bench/automation_00_leardboard.png)
 
 *官方 leaderboard：最强模型也只拿到约一半分数——这就是本文要拆解的核心谜题*
 
@@ -98,7 +98,7 @@ API 模式的"假"也假得用心：URL 路径、分页、必填字段、4xx 错
 
 三个机制合起来，用一张图总览：
 
-![AutomationBench 端到端运作流程图](/assets/img/automation_e2e.png)
+![AutomationBench 端到端运作流程图](/assets/img/automation-bench/automation_e2e.png)
 
 *端到端流程图：橙色箭头 = 写工具命中 world；紫色虚线 = 评分标准绕开推理直达评分——**模型全程看不到断言***
 
@@ -148,7 +148,7 @@ API 模式的"假"也假得用心：URL 路径、分页、必填字段、4xx 错
 
 模型停手后，六条断言检查它留下的世界：
 
-![官方 multi_hop_lookup 六条断言卡片](/assets/img/automation_02_case.png)
+![官方 multi_hop_lookup 六条断言卡片](/assets/img/automation-bench/automation_02_case.png)
 
 *官方页对这道门面题的评分展示：3 条正向断言 + 3 条负向断言*
 
@@ -194,7 +194,7 @@ API 模式的"假"也假得用心：URL 路径、分页、必填字段、4xx 错
 
 AutomationBench 测的正是：**把组织政策当作数据去检索、消解冲突、严格执行的能力**——先查后动、新旧冲突取最新、按条文而非按常识。这恰恰是 LLM 最不擅长、而真实职场最看重的东西。
 
-![官方 FAQ：为什么分数这么低](/assets/img/automation_03_FAQ.png)
+![官方 FAQ：为什么分数这么低](/assets/img/automation-bench/automation_03_FAQ.png)
 
 *官方对低分的解释：任务只在业务状态端到端正确时才算完成，"大部分做对"在严格评分下依然失败*
 

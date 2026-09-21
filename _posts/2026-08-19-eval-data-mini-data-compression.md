@@ -64,7 +64,7 @@ description: 只测 3% 的题，就能还原模型评测结论？五种评测集
 
 ### 2.2 Pipeline
 
-![K-Means：从全集样本聚类出代表性子集](/assets/img/pipeline_kmeans.png)
+![K-Means：从全集样本聚类出代表性子集](/assets/img/eval-data-compression/pipeline_kmeans.png)
 
 ### 2.3 关键特征
 
@@ -88,7 +88,7 @@ description: 只测 3% 的题，就能还原模型评测结论？五种评测集
 
 我们使用 VBench 数据集 (appearance_style) 进行 mini-data 压缩实践，采用 **均值对比图** 来衡量压缩数据集和原始数据集的特征关系。
 
-![Vbench-mini](/assets/img/pipeline_metadata_appearance_style_means_comparison.png)
+![Vbench-mini](/assets/img/eval-data-compression/pipeline_metadata_appearance_style_means_comparison.png)
 
 图中展示三个指标：
 
@@ -118,7 +118,7 @@ K-Means 虽然直观好用，但它有个绕不开的前提：**必须先跑完�
 
 ### 3.2 Pipeline
 
-![Kernel Herding：末层隐藏状态与 MMD 贪心选点](/assets/img/pipeline_herding.png)
+![Kernel Herding：末层隐藏状态与 MMD 贪心选点](/assets/img/eval-data-compression/pipeline_herding.png)
 
 ### 3.3 关键特征
 
@@ -154,7 +154,7 @@ K-Means 虽然直观好用，但它有个绕不开的前提：**必须先跑完�
 
 ### 4.2 Pipeline
 
-![PPL：困惑度难度分层与分层采样](/assets/img/pipeline_ppl.png)
+![PPL：困惑度难度分层与分层采样](/assets/img/eval-data-compression/pipeline_ppl.png)
 
 ### 4.3 关键特征
 
@@ -190,7 +190,7 @@ PPL 的思路很轻，但一维标量丢掉的信息太多：它只知道"难不
 
 ### 5.2 Pipeline
 
-![MetaBench：IRT 从作答矩阵提炼信息量](/assets/img/pipeline_metabench.png)
+![MetaBench：IRT 从作答矩阵提炼信息量](/assets/img/eval-data-compression/pipeline_metabench.png)
 
 ### 5.3 关键特征
 
@@ -226,7 +226,7 @@ MetaBench 很严谨，但它优化的是"信息量 / 能力重建"——这仍�
 
 ### 6.2 Pipeline
 
-![EssenceBench：遗传算法直攻排名一致性](/assets/img/pipeline_essencebench.png)
+![EssenceBench：遗传算法直攻排名一致性](/assets/img/eval-data-compression/pipeline_essencebench.png)
 
 ### 6.3 关键特征
 

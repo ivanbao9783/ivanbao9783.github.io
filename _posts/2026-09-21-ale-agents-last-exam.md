@@ -31,13 +31,13 @@ description: ALE（Agents' Last Exam）深度拆解——真实虚拟机、真�
 | 当前水平 | 实时榜单最强 Codex (GPT-6-Astra) 总全对率 34.2%；Last-Exam 档最高 13.2%（Claude Code + Opus 5）——论文发表时为 26.2% / 8.6% |
 | 单题成本 | $3–10、几十分钟到几小时，单跑上限 5 小时 |
 
-![官方题目构成分布图](/assets/img/ale_01_composition.png)
+![官方题目构成分布图](/assets/img/ale/ale_01_composition.png)
 
 *图 1｜来源：论文 arXiv:2606.05405（v2）Figure 2（"Distribution of 1,490 task instances across the ALE taxonomy"）。55 个子域 × 13 个集群的分布堆叠条形图——一张图同时交代官方数据集说明与题目构成，并顺带证明 55 域覆盖非零*
 
 看榜单前先分清两个口径：**公开的 152 题是评测集**（论文全部主结果跑在这上面），总池 1,500+ 工作流是 living benchmark 的持续扩充池；**full pass rate 只认满分**——一道 12 项检查的 ERP 流程过了 11 项，mean score 涨，pass rate 不涨。另外提醒：本文论文数据截至 arXiv v2（2026-06），榜单数据为 2026-09-20 实时抓取，两者并排引用时已分别标注。
 
-![官网 leaderboard Top10](/assets/img/ale_02_leardboard.png)
+![官网 leaderboard Top10](/assets/img/ale/ale_02_leardboard.png)
 
 *图 2｜来源：agents-last-exam.org/leaderboard，Overall 标签页（2026-09-20 抓取）。它证明两件事：榜首 Codex + GPT-6-Astra 也只有 34.2%，且长尾衰减极快。口径备注：榜单按 Best of AI runs 计（每题取该配置最高分的一次），论文主表为三次独立运行平均*
 
@@ -69,7 +69,7 @@ ALE 的可信度不靠玄学，靠三个硬机制：**考题是挖出来的、�
 
 三个机制合起来长什么样，官方论文在 §3.1 画过一张比任何自绘流程图都贴切的图，直接复用：
 
-![论文 Figure 6 评测管线架构图](/assets/img/ale_03_pipeline.png)
+![论文 Figure 6 评测管线架构图](/assets/img/ale/ale_03_pipeline.png)
 
 *图 3｜来源：论文 arXiv:2606.05405（v2）§3.1 Figure 6（"Evaluation pipeline architecture"）。图上三件事一次讲清：Task Specification（main.py）的 load()/start()/evaluate() 三阶段生命周期；agent（harness + model）只拿题面进入动作循环；远端 VM 的四目录契约（input/ 只读、software/ 预装、output/ 唯一可写、reference/ 对 agent 隐藏）*
 

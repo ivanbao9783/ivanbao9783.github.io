@@ -31,13 +31,13 @@ mermaid: true
 
 > 智谱 GLM-5.2：<https://z.ai/blog/glm-5.2>
 
-![GLM-5.2 Leaderboard](/assets/img/GLM-5.2 Leaderboard.png)
+![GLM-5.2 Leaderboard](/assets/img/swe-family/glm-5.2-leaderboard.png)
 
 2026 年 7 月，月之暗面发布 Kimi K3——全球首个开源 2.8 万亿参数模型。在它长达 8 项的 Coding 评测列表中，SWE 家族独占 5 席：`DeepSWE`、`Terminal-Bench 2.1`、`SWE-Marathon`、`FrontierSWE`、`PostTrainBench`。
 
 > Kimi K3：<https://mp.weixin.qq.com/s/V4xhEIy8xDXSMDPrPkmUAQ>
 
-![Kimi K3 Leaderboard](/assets/img/Kimi%20K3 Leaderboard.png)
+![Kimi K3 Leaderboard](/assets/img/swe-family/kimi-k3-leaderboard.png)
 
 这不是偶然。从 Anthropic 的 Claude、OpenAI 的 GPT-5 系列，到 DeepSeek、Qwen、Gemini——每一家模型厂商发布 Coding 能力时，SWE 榜单都是必选项。
 

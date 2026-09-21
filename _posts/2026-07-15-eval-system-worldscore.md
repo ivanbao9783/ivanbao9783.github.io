@@ -256,7 +256,7 @@ WorldScore 设立了两个核心指标，分别考核世界模型的两种基础
 
 **数据集样例和指标**
 
-![worldscore-data-sample](/assets/img/worldscore_datasample-20260608.png)
+![worldscore-data-sample](/assets/img/worldscore/worldscore_datasample-20260608.png)
 
 ### 2.3 WorldScore 评测软件架构
 
@@ -266,7 +266,7 @@ WorldScore 通过 “统一落盘格式 + 统一调度框架 + 插件化模型/�
 - 评测侧：不感知模型区别，只读统一格式，按 type（prompt/base/camera）三分支调度。
 - 指标侧：每个 metric 的 compute_scores() 是插件，外部评测调度模块不感知每个 metric 内部算法。
 
-![worldscore-framework](/assets/img/worldscore-framework-20260608.png)
+![worldscore-framework](/assets/img/worldscore/worldscore-framework-20260608.png)
 
 ---
 

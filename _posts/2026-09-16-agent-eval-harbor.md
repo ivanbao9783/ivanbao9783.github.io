@@ -41,7 +41,7 @@ math: true
 
 更糟的是，这税不止交一次。每次换模型、每次改 prompt、每次发版，你都想重新验证一遍——**每次都要重新付一遍这笔适配税**。
 
-![图A：N×M 适配混乱与 N+M 统一接入的对比](/assets/img/blog-figA-pain-comparison.png)
+![图A：N×M 适配混乱与 N+M 统一接入的对比](/assets/img/agent-eval-harbor/blog-figA-pain-comparison.png)
 
 问题出在哪？
 
@@ -83,7 +83,7 @@ Harbor 就是奔着这层来的——把 N×M 的账改写成 **N+M**：数据�
 
 没有这四样，考试就是走过场。
 
-![隐喻图：一场 Agent 考试——考卷、考生、考场、判卷人、教务处与成绩单的对应](/assets/img/blog-view1-metaphor.png)
+![隐喻图：一场 Agent 考试——考卷、考生、考场、判卷人、教务处与成绩单的对应](/assets/img/agent-eval-harbor/blog-view1-metaphor.png)
 
 Agent 评测同理——格式不统一，就是考卷不标准；环境互相污染，就是考场不隔离；Agent 自己验证自己，就是考生判自己的卷。
 
@@ -98,7 +98,7 @@ Agent 评测同理——格式不统一，就是考卷不标准；环境互相�
 
 Harbor 的全部设计，就是把这套考试制度工程化：
 
-![Harbor 整体架构：数据层、编排层、沙箱层、结果层自上而下流转](/assets/img/blog-view2-architecture.png)
+![Harbor 整体架构：数据层、编排层、沙箱层、结果层自上而下流转](/assets/img/agent-eval-harbor/blog-view2-architecture.png)
 
 一条命令敲下去，数据流自上而下走一遍：
 
@@ -143,7 +143,7 @@ for attempt in attempts:      # 考几次
 
 闸门是一个 **Semaphore**——`--n-concurrent 4` 就意味着只有 4 枚令牌。拿到令牌的 Trial 才能起沙箱开跑，跑完归还令牌，队首补位。
 
-![图B：Job 把任务 × Agent × 尝试展开成 Trial 矩阵，统一调度、并行执行](/assets/img/blog-figB-job-trial-orchestration.png)
+![图B：Job 把任务 × Agent × 尝试展开成 Trial 矩阵，统一调度、并行执行](/assets/img/agent-eval-harbor/blog-figB-job-trial-orchestration.png)
 
 `asyncio.Semaphore` 是 Python 里再普通不过的原语——但正因为简单，它可依赖。没有线程池的黑魔法，没有优先级队列的过度设计，一个闸门管住所有洪水。
 
@@ -165,7 +165,7 @@ Harbor 的处理分四步：**记录状态 → 广播事件 → 抢救输出 →
 
 Harbor 的答案是一个三层结构：
 
-![图C：沙箱双轨——本地 Docker 或云端环境二选一，每个 Trial 独占一间考场](/assets/img/blog-figC-sandbox-dual-track.png)
+![图C：沙箱双轨——本地 Docker 或云端环境二选一，每个 Trial 独占一间考场](/assets/img/agent-eval-harbor/blog-figC-sandbox-dual-track.png)
 
 最顶层是 `BaseEnvironment`，只暴露五个动作：`start → setup → exec → stop → delete`。编排层从生到死只见这五个动作，**完全不知道底下跑的是 Docker 还是 Daytona**。
 
@@ -196,7 +196,7 @@ EnvFactory 进来，查表，拿到模块路径和类名。就这么直接——
 
 ### 3.3 判卷层：一份 patch 的最终命运
 
-![图D：判卷与汇总——patch 接力进验证考场，reward 统一收集、汇总成 pass@k](/assets/img/blog-figD-verdict-aggregation.png)
+![图D：判卷与汇总——patch 接力进验证考场，reward 统一收集、汇总成 pass@k](/assets/img/agent-eval-harbor/blog-figD-verdict-aggregation.png)
 
 推理沙箱里的 Agent 留下了改动——但沙箱马上就要销毁了。所以在停止之前，有个抢救动作：**collect**。通过 service 执行 `git diff`，把改动导出成 `model.patch`。
 
