@@ -9,7 +9,6 @@ leaderboard_url:     # 官方 leaderboard
 
 # 选填（强烈建议）
 repo_url:            # 代码/数据仓库（供挖 task 卡原文）
-hf_url:              # HuggingFace 数据集卡地址（字段/规模/splits/license 最全的结构化入口）
 paper_pdf_url:       # 论文 PDF 直链（abs 页只有摘要，主结果表/附录任务卡需全文时用）
 
 # 口径（不填走默认值）
