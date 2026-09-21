@@ -6,7 +6,7 @@
 
 **Architecture:** 纯文档任务，零代码改动。任务①产出 `docs/plans/2026-09-21-learning-path.md`（docs/ 已被 `_config.yml` exclude，不公开渲染）；任务②为 `_domains/{cluster}/{node}.md` ×15 追加总览正文（保留 front matter）。不改动 starmap.yml / 布局 / JS / CSS。
 
-**Tech Stack:** Jekyll + Markdown；验证用 `bundle exec jekyll build` + Grep 零面试痕迹检查。
+**Tech Stack:** Jekyll + Markdown；验证用 Grep 措辞检查 + GitHub Actions CI（**不做本地 bundle 验证**——Windows 装 bundler 易卡死子代理，一律推 CI 验证）。
 
 **设计文档:** `docs/specs/2026-09-21-learning-path-design.md`
 
@@ -367,17 +367,17 @@ git commit -m "docs: add learning path plan (priority-driven, 15-node consolidat
 关键问题：性能指标的测量口径与陷阱、量化精度对能力与性能的双向影响、推理栈配置作为评测变量的控制。代表工作：vLLM/SGLang 等推理引擎的性能基准实践。本页内容规划中：LLM 推理性能基准（吞吐/延迟/SLO）首篇。
 ```
 
-- [ ] **Step 6: 本地构建验证**
+- [ ] **Step 6: 提交并推送，CI 验证**
 
-Run: `bundle exec jekyll build`
-Expected: Build success，无 Liquid 报错；`_site/domains/eval-system/*/index.html` 生成且含「领域定义」小节
-
-- [ ] **Step 7: 向站长展示变更摘要，确认后提交**
+不做本地 bundle 构建（Windows 环境易卡死）。向站长展示变更摘要，确认后：
 
 ```powershell
 git add _domains/eval-system/
 git commit -m "docs(domains): add overview to eval-system cluster node pages"
+git push
 ```
+
+Expected: GitHub Actions Pages Deploy 工作流通过（推送后在 Actions 页确认）；通过后线上 `/domains/eval-system/*/` 各页均显示「领域定义」小节
 
 ---
 
@@ -487,17 +487,17 @@ Rubric 与指标设计是评测的「判卷标准」学：如何把模型/agent 
 关键问题：评测结果异常的统计检验方法、异常分类（分数异常/行为异常/环境异常）、处置流程（定位→归因→修复→回归验证）。已有实践记录（LLM 响应异常检测）见本页博文列表；后续规划：统计检验方法在评测中的应用专题。
 ```
 
-- [ ] **Step 7: 本地构建验证**
+- [ ] **Step 7: 提交并推送，CI 验证**
 
-Run: `bundle exec jekyll build`
-Expected: Build success；`_site/domains/dataset/*/index.html` 与 `_site/domains/scoring/*/index.html` 均含「领域定义」小节
-
-- [ ] **Step 8: 向站长展示变更摘要，确认后提交**
+不做本地 bundle 构建（Windows 环境易卡死）。向站长展示变更摘要，确认后：
 
 ```powershell
 git add _domains/dataset/ _domains/scoring/
 git commit -m "docs(domains): add overview to dataset and scoring cluster node pages"
+git push
 ```
+
+Expected: GitHub Actions Pages Deploy 工作流通过；线上 `/domains/dataset/*/` 与 `/domains/scoring/*/` 各页均显示「领域定义」小节
 
 ---
 
@@ -573,17 +573,17 @@ Agent 评测的本质差异——多步决策、环境交互、长时程、成�
 关键问题：各训练阶段（SFT/RLHF/RL）的评测侧重、评测如何反馈训练、训练-评测闭环中的过拟合风险。代表工作：InstructGPT/RLHF 流程中的评测环节、RL 训练的 reward 评估。本页内容规划中：训练范式与评测的互动关系首篇。
 ```
 
-- [ ] **Step 5: 本地构建验证**
+- [ ] **Step 5: 提交并推送，CI 验证**
 
-Run: `bundle exec jekyll build`
-Expected: Build success；`_site/domains/edge/*/index.html` 均含「领域定义」小节
-
-- [ ] **Step 6: 向站长展示变更摘要，确认后提交**
+不做本地 bundle 构建（Windows 环境易卡死）。向站长展示变更摘要，确认后：
 
 ```powershell
 git add _domains/edge/
 git commit -m "docs(domains): add overview to edge cluster node pages"
+git push
 ```
+
+Expected: GitHub Actions Pages Deploy 工作流通过；线上 `/domains/edge/*/` 各页均显示「领域定义」小节
 
 ---
 
@@ -599,17 +599,8 @@ Expected: 0 匹配。若有匹配，修改对应措辞后重查。
 用 Grep 工具检查 `_domains/` 目录，pattern：`## 领域定义`，output_mode: count
 Expected: 15 个文件各 1 次匹配
 
-- [ ] **Step 3: 全量构建验证**
+- [ ] **Step 3: CI 全量验证（不做本地构建）**
 
-Run: `bundle exec jekyll build`
-Expected: Build success 无警告新增；站点首页星图不受影响（本计划未改 starmap.yml）
+Task 2-4 已逐任务推送触发 CI；本步骤确认最后一次推送的 GitHub Actions Pages Deploy 工作流通过（构建成功即代表 15 页 Liquid 渲染无误）。站点首页星图不受影响（本计划未改 starmap.yml，无需额外验证）。
 
-- [ ] **Step 4: 推送触发 CI**
-
-向站长展示整体变更摘要，确认后：
-
-```powershell
-git push
-```
-
-Expected: GitHub Actions Pages Deploy 工作流通过，线上 15 个节点页均显示总览
+Expected: Actions 工作流绿色通过，线上 15 个节点页均显示总览
