@@ -14,4 +14,25 @@ node: corpus
 
 ## 知识版图与规划
 
-关键问题：数据集分类体系与选型框架、版本演进与分数可比性、数据集质量与污染识别。代表工作：MMLU/HumanEval 等经典基准、SWE-bench 系列、ALE、AutomationBench、DeepSWE、WorldScore。已有实践记录（多篇数据集解读）见本页博文列表；后续规划：持续扩展解读版图。
+| 数据集 | 针对领域 | 类型 | 考察能力 | 沙箱 |
+|---|---|---|---|---|
+| SWE-bench | 软件编码 | Agent | 真实 issue 定位与补丁生成（Python） | 容器（Docker，支持云端） |
+| SWE-bench Verified | 软件编码 | Agent | 同上，人工校验 500 题排除坏题干扰 | 容器（同 SWE-bench） |
+| SWE-bench Multilingual | 软件编码 | Agent | 跨语言（9 语言）代码泛化修复 | 容器（同 SWE-bench） |
+| SWE-bench Pro | 软件编码 | Agent | 企业级商业仓库长任务：长上下文与工程复杂度 | 容器（Docker / Modal 云） |
+| DeepSWE | 软件编码 | Agent | 零污染原创题下的真实工程能力（5 语言 91 仓库） | 容器（Harbor 生态） |
+| FrontierSWE | 软件编码 | Agent | 人类极限难度工程题：前沿推理与极限工程 | 容器（Harbor 生态） |
+| ALE | 职业工作流 | Agent | 55 个职业领域的专业工作流复现与工具操作 | 虚拟机（多云 provider，Docker 仅轻量子集） |
+| AutomationBench | 职业工作流 | Agent | 业务 SaaS 多应用工具编排与任务完成度（6 域 47 mock 应用） | 无（进程模拟） |
+| WorldScore | 视频/图片生成 | 世界模型 | 物理一致性、空间理解、动态预测 | 无（离线生成式评测） |
+| GPQA | 学科问答 | LLM | 研究生级学科推理、抗检索性 | 无（静态作答） |
+| MMLU / MMLU-Pro | 学科问答 | LLM | 学科知识广度，Pro 版叠加多步推理 | 无（静态作答） |
+| MMMU / MMMU-Pro | 学科问答 | 多模态 | 大学级图文交叉理解与推理 | 无（静态作答） |
+
+执行环境形态与评测对象强相关：Agent 评测走向容器/虚拟机隔离，LLM 与生成式评测则不对执行环境做强隔离。
+
+**关键问题**：预训练污染的识别与防范；如何按评测目的选型——静态作答类看知识覆盖，沙箱类看任务真实性。
+
+**已有实践**：SWE 家族、ALE、AutomationBench、DeepSWE、WorldScore 五篇解读，见本页博文列表。
+
+**后续规划**：持续扩展解读版图，补充经典 LLM 基准（MMLU/GPQA 系）的解读。

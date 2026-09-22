@@ -14,4 +14,10 @@ node: observability
 
 ## 知识版图与规划
 
-关键问题：trace 数据模型（span/链路/评分关联）、回归定位工作流（分数下降 → 环节定位）、观测工具链选型。代表工作：Langfuse、OpenTelemetry 在 LLM 场景的应用。已有实践记录（Langfuse 集成）见本页博文列表；后续规划：trace 分析与回归定位工作流专题。
+**关键问题**：trace 数据模型（span/链路/评分关联）、回归定位工作流（分数下降 → 环节定位）、观测工具链选型。
+
+**代表工作**：Langfuse、OpenTelemetry 在 LLM 场景的应用。
+
+**已有实践**：Langfuse 集成一篇，见本页博文列表。
+
+**后续规划**：trace 分析与回归定位工作流专题。

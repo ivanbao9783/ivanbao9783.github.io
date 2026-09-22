@@ -14,4 +14,10 @@ node: paradigm
 
 ## 知识版图与规划
 
-关键问题：范式演进谱系与适用场景、LLM-as-judge 的偏差类型与校准方法、评测范式与产品形态的匹配。代表工作：IBM CLEAR、从 LLM judge 到 agent judge 的演进研究。已有实践记录（范式迁移、LLM-to-Agent-Judge）见本页博文列表；后续规划：judge 偏差与校准专题。
+**关键问题**：范式演进谱系与适用场景、LLM-as-judge 的偏差类型与校准方法、评测范式与产品形态的匹配。
+
+**代表工作**：IBM CLEAR、从 LLM judge 到 agent judge 的演进研究。
+
+**已有实践**：范式迁移、LLM-to-Agent-Judge，见本页博文列表。
+
+**后续规划**：judge 偏差与校准专题。

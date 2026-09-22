@@ -14,4 +14,8 @@ Rubric 与指标设计是评测的「判卷标准」学：如何把模型/agent 
 
 ## 知识版图与规划
 
-关键问题：Rubric 设计模式的适用场景、确定性 vs LLM-judge 指标的分工（门禁用确定性、趋势分析用 judge）、pass@k 等指标的计算与误用。代表工作：HELM 的指标体系、各类 LLM-as-judge 研究。本页内容规划中：Rubric 设计模式与指标体系首篇。
+**关键问题**：Rubric 设计模式的适用场景、确定性 vs LLM-judge 指标的分工（门禁用确定性、趋势分析用 judge）、pass@k 等指标的计算与误用。
+
+**代表工作**：HELM 的指标体系、各类 LLM-as-judge 研究。
+
+**内容规划**：Rubric 设计模式与指标体系首篇。
