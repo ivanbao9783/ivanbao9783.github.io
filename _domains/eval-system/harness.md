@@ -14,4 +14,4 @@ node: harness
 
 ## 知识版图与规划
 
-关键问题：沙箱隔离与环境一致性、任务分发与并行调度、防作弊设计、评测与 CI/CD 的集成。代表工作：lm-evaluation-harness、EvalScope、SWE-bench harness、Harbor。已有实践记录（EvalScope/Harbor 源码剖析、agentperf）见本页博文列表；后续规划：框架源码横向对比、CI 集成细节深化。
+关键问题：沙箱隔离与环境一致性、任务分发与并行调度、防作弊设计、评测与 CI/CD 的集成。代表工作：lm-evaluation-harness、EvalScope、SWE-bench harness、Harbor。已有实践记录（EvalScope/Harbor 源码剖析、agentperf、IBM CLEAR 拆解）见本页博文列表；后续规划：框架源码横向对比、CI 集成细节深化。

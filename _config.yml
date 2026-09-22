@@ -209,7 +209,6 @@ defaults:
     values:
       layout: domain
       permalink: /domains/:path/
-      curated: false
 
 sass:
   style: compressed

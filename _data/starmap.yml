@@ -18,6 +18,7 @@ clusters:
           - 2026-07-15-agent-eval-harness.md
           - 2026-07-15-agent-eval-02-evalscope.md
           - 2026-09-16-agent-eval-harbor.md
+          - 2026-07-15-agent-eval-04-ibm-clear.md
       - id: paradigm
         title: 评测范式
         status: deep
@@ -25,7 +26,6 @@ clusters:
         y: 420
         posts:
           - 2026-07-15-agent-eval-01-paradigm-shift.md
-          - 2026-07-15-agent-eval-04-ibm-clear.md
           - 2026-07-24-eval-system-llm-to-agent-judge.md
       - id: hotspot
         title: 评测热点

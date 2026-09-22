@@ -17,16 +17,9 @@ layout: default
   <header>
     <h1>{{ page.title }}</h1>
     <p style="color:#6c757d;font-size:0.9rem;">
-      {{ node.posts | size }} 篇博文 ·
-      {% if page.curated %}已整理{% else %}<span style="background:#fff3cd;color:#856404;padding:0.1rem 0.5rem;border-radius:0.25rem;font-size:0.8rem;">整理中</span>{% endif %}
+      {{ node.posts | size }} 篇博文
     </p>
   </header>
-
-  {% unless page.curated %}
-  <blockquote style="border-left:4px solid #d8bd7f;background:#fdf9ef;padding:0.75rem 1rem;border-radius:0 0.4rem 0.4rem 0;">
-    该领域还在整理中——当前为自动聚合视图，后续会补充概述、核心概念与学习路径。
-  </blockquote>
-  {% endunless %}
 
   <div class="content">
     {{ content }}
