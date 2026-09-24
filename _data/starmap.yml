@@ -61,6 +61,7 @@ clusters:
           - 2026-07-15-eval-system-worldscore.md
           - 2026-07-20-agent-eval-05-swe-family.md
           - 2026-09-21-ale-agents-last-exam.md
+          - 2026-09-24-mmlu-pro.md
           - 2026-09-21-automation-bench.md
           - 2026-09-21-deepswe.md
       - id: construction

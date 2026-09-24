@@ -33,6 +33,6 @@ node: corpus
 
 **关键问题**：预训练污染的识别与防范；如何按评测目的选型——静态作答类看知识覆盖，沙箱类看任务真实性。
 
-**已有实践**：SWE 家族、ALE、AutomationBench、DeepSWE、WorldScore 五篇解读，见本页博文列表。
+**已有实践**：SWE 家族、ALE、AutomationBench、DeepSWE、WorldScore、MMLU-Pro 六篇解读，见本页博文列表。
 
-**后续规划**：持续扩展解读版图，补充经典 LLM 基准（MMLU/GPQA 系）的解读。
+**后续规划**：持续扩展解读版图，补充经典 LLM 基准（GPQA 系）的解读。
