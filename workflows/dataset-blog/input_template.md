@@ -10,6 +10,8 @@ leaderboard_url:     # 官方 leaderboard
 # 选填（强烈建议）
 repo_url:            # 代码/数据仓库（供挖 task 卡原文）
 paper_pdf_url:       # 论文 PDF 直链（abs 页只有摘要，主结果表/附录任务卡需全文时用）
+aa_leaderboard_url:  # Artificial Analysis 榜单地址（artificialanalysis.ai 上该数据集对应的榜单页）。
+                     # 无官网/官方榜单易失真数据集的第一校准源；用户填写时优先级最高（P1 榜单路以它为准）
 
 # 口径（不填走默认值）
 platform:            # 知乎（默认）/ 掘金 / 双平台
