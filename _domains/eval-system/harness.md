@@ -18,6 +18,6 @@ node: harness
 
 **代表工作**：lm-evaluation-harness、EvalScope、SWE-bench harness、Harbor。
 
-**已有实践**：EvalScope/Harbor 源码剖析、agentperf、IBM CLEAR 拆解，见本页博文列表。
+**已有实践**：EvalScope/Harbor 源码剖析（含沙箱网络管控全链路拆解）、agentperf、IBM CLEAR 拆解，见本页博文列表。
 
 **后续规划**：框架源码横向对比、CI 集成细节深化。

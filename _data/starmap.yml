@@ -19,6 +19,7 @@ clusters:
           - 2026-07-15-agent-eval-02-evalscope.md
           - 2026-09-16-agent-eval-harbor.md
           - 2026-07-15-agent-eval-04-ibm-clear.md
+          - 2026-09-24-harbor-sandbox-network.md
       - id: paradigm
         title: 评测范式
         status: deep
