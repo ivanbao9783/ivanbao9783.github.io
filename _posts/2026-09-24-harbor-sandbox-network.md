@@ -1,7 +1,7 @@
 ---
 title: "我给 AI Agent 断了网，它却毫无察觉——Harbor 沙箱网络管控全链路拆解"
 author: ivanbao9783
-date: 2026-09-24 10:00:00 +0800
+date: 2026-09-24 09:00:00 +0800
 categories: [评测系统]
 tags: [Agent评测, Harbor, 沙箱, 网络管控, 评测框架]
 description: 从 task.toml 里的双层网络配置（baseline/phase），到 sidecar 容器里的两套拦截机制（nft 关卡 + gost 审讯室），再到一次评测从 compose up 到 compose down 的网络一生——完整拆解 Harbor 沙箱如何做到"准备期放行装依赖、做题期断网防作弊"，且全程不碰宿主机 iptables。
