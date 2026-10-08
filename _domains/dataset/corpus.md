@@ -27,12 +27,13 @@ node: corpus
 | WorldScore | 视频/图片生成 | 世界模型 | 物理一致性、空间理解、动态预测 | 无（离线生成式评测） |
 | GPQA | 学科问答 | LLM | 研究生级学科推理、抗检索性 | 无（静态作答） |
 | MMLU / MMLU-Pro | 学科问答 | LLM | 学科知识广度，Pro 版叠加多步推理 | 无（静态作答） |
+| Terminal-Bench | 职业工作流 | Agent | 终端环境端到端任务：多领域真实交付物，语义化版本的持续基准 | 容器（Docker，Harbor 编排） |
 | MMMU / MMMU-Pro | 学科问答 | 多模态 | 大学级图文交叉理解与推理 | 无（静态作答） |
 
 执行环境形态与评测对象强相关：Agent 评测走向容器/虚拟机隔离，LLM 与生成式评测则不对执行环境做强隔离。
 
 **关键问题**：预训练污染的识别与防范；如何按评测目的选型——静态作答类看知识覆盖，沙箱类看任务真实性。
 
-**已有实践**：SWE 家族、ALE、AutomationBench、DeepSWE、WorldScore、MMLU-Pro 六篇解读，见本页博文列表。
+**已有实践**：SWE 家族、ALE、AutomationBench、DeepSWE、WorldScore、MMLU-Pro、Terminal-Bench 七篇解读，见本页博文列表。
 
 **后续规划**：持续扩展解读版图，补充经典 LLM 基准（GPQA 系）的解读。

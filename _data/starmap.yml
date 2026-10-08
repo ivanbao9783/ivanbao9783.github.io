@@ -64,6 +64,7 @@ clusters:
           - 2026-09-24-mmlu-pro.md
           - 2026-09-21-automation-bench.md
           - 2026-09-21-deepswe.md
+          - 2026-10-08-terminal-bench.md
       - id: construction
         title: 数据集构建
         status: planned
