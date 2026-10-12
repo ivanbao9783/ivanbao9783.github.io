@@ -80,7 +80,7 @@ clusters:
           - 2026-08-19-eval-data-mini-data-compression.md
   - id: scoring
     title: 评分与诊断
-    ellipse: { cx: 690, cy: 550, rx: 145, ry: 130 }
+    ellipse: { cx: 690, cy: 550, rx: 160, ry: 150 }
     nodes:
       - id: metrics
         title: Rubric 与指标设计
