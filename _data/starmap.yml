@@ -104,10 +104,12 @@ clusters:
           - 2026-08-29-llm-response-anomaly-detection.md
       - id: badcase
         title: Badcase 分析
-        status: planned
+        status: deep
         x: 700
         y: 655
-        posts: []
+        posts:
+          - 2026-10-12-automationbench-deterministic-zero.md
+          - 2026-10-12-automationbench-effort-regression.md
   - id: edge
     title: 周边领域
     ellipse: { cx: 1075, cy: 540, rx: 200, ry: 185 }

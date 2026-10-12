@@ -20,6 +20,6 @@ Badcase 分析是评测的「错题本」学：对数据集中的失败样本（
 
 **关键问题**：badcase 的归因方法（数据集问题 / 模型问题 / harness 问题的区分判据）、三类根因各自的典型案例模式、从个案到系统性结论的归纳边界。
 
-**代表工作**：automation、DeepSWE 等数据集的 badcase 复盘实践。
+**代表工作**：AutomationBench 的 badcase 复盘实践（已发布两篇：确定性全零、推理档退化）；`workflows/badcase-analysis/` 沉淀的 badcase 积累方法论（现场还原 → 资产抽取 → 类型归档 → 融合沉淀）。
 
-**内容规划**：automation 与 DeepSWE 数据集的 badcase 分析系列博文（筹备中）。
+**内容规划**：延续 AutomationBench badcase 复盘系列（步数悬崖、近失完备性、结构性预算等类型），并按方法论持续归档新数据集案例。
