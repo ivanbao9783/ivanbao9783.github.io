@@ -128,10 +128,11 @@ clusters:
         posts: []
       - id: inference
         title: 推理知识
-        status: planned
+        status: seeded
         x: 960
         y: 635
-        posts: []
+        posts:
+          - 2026-10-13-llm-sampling-params.md
       - id: training
         title: 训练知识
         status: planned

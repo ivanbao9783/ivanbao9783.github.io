@@ -88,15 +88,21 @@ mermaid: true
 
 ---
 
-## 五、事实核查清单（写作前必须坐实）
+## 五、事实核查清单（已全部核实，结论如下）
 
-- [x] **执行顺序**（已核到结论）：主流顺序 = **`重复惩罚 → 温度 → top_k → top_p → (min_p)`**（依据：HuggingFace **Swift 版官方文档**明确标注此链，并注明"温度在重复惩罚之后、过滤之前"）。**顺序随版本而变**——老版 HF Python（v3.5.1）`_get_logits_warper` 为 `top_k → top_p → temperature`，与现行相反。**补充**：`top_k`/`top_p` 均作用于 **logits** 掩码，`softmax` 只在最后做一次；`top_p` 内部临时算一次概率判断阈值（→ 第 1 节配图按此"真实版"绘制）。
-  - [ ] **剩余**：确认**当前 HF Python 版** `_get_logits_warper` 的顺序并记录版本号（正文以当前版为准，脚注说明版本差异）
-- [ ] **框架差异**：vLLM（或 SGLang）等推理引擎中三者的默认顺序，是否与 HF 一致
-- [ ] **`temperature=0` 的处理**：HF / 主流服务框架如何特判（是否转极小值、是否走 greedy）
-- [ ] **核采样出处**：Holtzman et al. 2019《The Curious Case of Neural Text Degeneration》——核对标题与年份
-- [ ] **公式与边界**：`softmax(z/T)`、`T→0` 极限为 one-hot、`top_k` 排序不变性
-- [ ] **延伸项**：`min_p` 是否作为一句话延伸提及（若提，需核对来源）
+- [x] **执行顺序**：主流顺序 = **`重复惩罚 → 温度 → top_k → top_p → (min_p)`**。
+  - **当前 HF Python（transformers）**：`_get_logits_processor` 先应用 `RepetitionPenalty` 等；`_get_logits_warper` 内的顺序为 **`TemperatureLogitsWarper → TopKLogitsWarper → TopPLogitsWarper`**（即 温度 → top_k → top_p）。来源：DeepWiki《Generation System Internals》（索引 2025-11），`src/transformers/generation/utils.py`。
+  - **顺序随版本而变**：老版 HF Python（**v3.5.1**）`_get_logits_warper` 为 **`top_k → top_p → temperature`**，与现行相反（来源：HF v3.5.1 官方源码页）。→ **正文以当前版为准，脚注说明"顺序会随框架/版本变化"**。
+  - **实现细节**：`top_k`/`top_p` 均在 **logits** 上做掩码，`softmax` **只在最后做一次**；`top_p` 内部临时算一次概率判断阈值（→ 第 1 节配图按此"真实版"绘制）。
+- [x] **框架差异（vLLM）**：vLLM v1 `Sampler` 官方步骤：先在 logits 上做惩罚 → **应用温度** → 应用 argmax-invariant 处理器（**min_p**）→ **top_k 和/或 top_p** → 采样。即顺序同为 **温度 → 过滤**，与 HF 一致；差异仅在 `min_p` 的插入位置（vLLM 在 top_k/top_p **之前**，HF Swift 在**之后**）。
+- [x] **`temperature=0` 的处理**：
+  - **vLLM**：`temperature` 文档明确"**Zero means greedy sampling**"；采样器以 `_SAMPLING_EPS = 1e-5` 为界，`temperature < eps` 时回退到 greedy。
+  - **HF（transformers）**：`TemperatureLogitsWarper` 要求温度**严格为正**，传 0 会报错并提示"If you're looking for greedy decoding strategies, set `do_sample=False`"。
+  - → 正文表述：**`T→0` 数学上退化为 one-hot/贪心**；工程实现里 `temperature=0` 通常被特判为贪心（vLLM）或改用 `do_sample=False`（HF）。
+- [x] **核采样出处**：**Holtzman, Buys, Forbes, Choi (2019)《The Curious Case of Neural Text Degeneration》, arXiv:1904.09751**（2019-04-22）。标题、年份无误。
+- [x] **公式与边界**：`p_i = softmax(z_i / T)`；`T→0⁺` 时分布趋于 **one-hot（argmax）**；`T` 单调变换不改变排序 → **`top_k` 结果与温度无关**（只看排序），而 **`top_p` 依赖概率、受温度影响**（温度升高会放大 nucleus，来源：Ultralytics 术语页"top-p 在温度之后计算，温度越高 nucleus 越大"）。
+- [x] **延伸项 `min_p`**：来源 **Nguyen et al.《Turning Up the Heat: Min-p Sampling for Creative and Coherent LLM Outputs》, arXiv:2407.01082（2024-07-01 提交，ICLR 2025 Oral）**，已被 HF Transformers、vLLM 等采纳。定义：`p_i ≥ min_p × p_max`（锚定相对峰值）。→ **结尾提一句，不展开**。
+- [x] **典型默认值**（供速查表）：HF `temperature=1.0`、`top_k=50`、`top_p=1.0`（默认即禁用过滤）。
 
 > 核查结论直接写进正文对应小节，并在文档内以脚注/引用形式标注来源。
 
