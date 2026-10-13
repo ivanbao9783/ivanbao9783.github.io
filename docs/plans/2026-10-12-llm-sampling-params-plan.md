@@ -27,8 +27,10 @@
 | 动作 | 路径 | 职责 |
 |---|---|---|
 | Create | `_posts/2026-XX-XX-llm-sampling-params.md` | 博文正文（头部钩子 + 7 节 + 速查表） |
-| Create | `assets/img/llm-sampling-params/temperature-distribution.png` | 温度对分布形状的影响（三合一对比图） |
-| Create | `assets/img/llm-sampling-params/topk-vs-topp.png` | top_k 与 top_p 截断差异（Excalidraw 导出） |
+| Create | `assets/img/llm-sampling-params/temperature-distribution.png` | 温度对分布形状的影响（脚本生成） |
+| Create | `assets/img/llm-sampling-params/sampling-order-pipeline.excalidraw` | 执行顺序 + 输入输出图源文件 |
+| Create | `assets/img/llm-sampling-params/topk-vs-topp.excalidraw` | top_k vs top_p 截断对比图源文件 |
+| Create | `assets/img/llm-sampling-params/*.png` | 由上述 Excalidraw 源文件导出（站长操作）；**提交前必须已存在**（正文会引用） |
 | Modify | `_data/starmap.yml` | 将本文挂到 `edge.inference`，status `planned → seeded` |
 | 不动 | `_domains/edge/inference.md` | 已有总览正文，无需改动 |
 | 不动 | 布局 / JS / CSS | 本任务不改动站点承载层 |
@@ -60,11 +62,11 @@ mermaid: true
 |---|---|---|---|---|
 | — | 开场钩子 | 同一问题问两次、答案却不同——不是"发挥不稳"，而是每次都在按概率抽签 | ~200 | — |
 | — | 📋 读完你将了解 | 5 条清单（掷骰子心智模型 / 三参数分工 / 执行顺序 / 典型取值 / 速查表） | ~80 | — |
-| 1 | 模型每一步，其实在"掷骰子" | logits 是什么 → softmax 变概率 → 贪心 vs 采样 | ~500 | 管线总览图（mermaid） |
+| 1 | 模型每一步，其实在"掷骰子" | logits 是什么 → softmax 变概率 → 贪心 vs 采样 | ~500 | 执行顺序 + 输入输出图（mermaid，突出三参数） |
 | 2 | 温度：控制骰子"偏"到什么程度 | 公式 `p = softmax(z/T)`；T<1 锐化 / T>1 拉平；`T→0` 退化为贪心；`T=0` 实现特判 | ~600 | 温度三合一分布对比图 |
 | 3 | `top_k`：只留分数最高的 k 个 | 机制；"固定数量"的软肋（不随置信度自适应） | ~400 | （并入下节对比图） |
 | 4 | `top_p`：留到累积概率够 p 为止 | 核采样机制；数量自适应；为何比 top_k 更主流；引用 Holtzman et al. 2019 | ~450 | top_k vs top_p 截断对比图（Excalidraw） |
-| 5 | 三者一起用时，顺序有讲究 | `top_k` 只看排序、不受温度影响；`top_p` 依赖概率、受温度影响；不同框架默认顺序不同 | ~450 | — |
+| 5 | 三者一起用时，顺序有讲究 | `top_k` 只看排序、不受温度影响；`top_p` 依赖概率、受温度影响；不同框架默认顺序不同 | ~450 | 引用第 1 节流程图（不另配图） |
 | 6 | 常见误区 | `temperature=0` 未必可复现；`top_k`/`top_p` 可叠加；贪心/beam search 下三者基本失效 | ~350 | — |
 | 7 | 一页速查表 | 参数 · 作用对象 · 机制 · 典型取值 · 效果 | ~150 | 原生表格 |
 | — | 结尾 | 一句背景式呼应：这也是评测里必须锁死采样参数的原因 | ~100 | — |
@@ -77,7 +79,7 @@ mermaid: true
 
 | 图 | 位置 | 形式 | 内容指令 |
 |---|---|---|---|
-| 生成管线总览图 | 第 1 节 | mermaid | `logits → 温度 → top_k → top_p → softmax → 采样` 的链式流程图；注明各步"改什么"（形状/候选集合）；**mermaid 文字颜色需按可读性调色**（沿用既有博文配色习惯） |
+| 执行顺序 + 输入输出图（流程总览） | 第 1 节（第 5 节引用） | **两步**：① mermaid 草图 → 站长确认构图 → ② 转 Excalidraw（圆角 + 手写字体），源文件存 `sampling-order-pipeline.excalidraw`，PNG 由站长导出 | **突出三参数**：【温度】【top_k】【top_p】为高亮节点；其余步骤（原始 logits、重复惩罚、softmax、采样）简化为灰色小节点。箭头标注数据流 = 各步"输入 → 输出"：原始 logits →[温度]→ 重标定 logits →[top_k]→ 候选裁剪后 logits →[top_p]→ 再裁剪后 logits →softmax→ 概率分布 →采样→ 单个 token。标准顺序 `重复惩罚 → 温度 → top_k → top_p`；**图下加脚注"顺序随实现/版本而异"** |
 | 温度三合一分布图 | 第 2 节 | PNG（生成图） | 同一组 logits 下三条分布对比：T=0.5（尖锐）/ T=1.0（原样）/ T=2.0（拉平）；横轴为 top-N 候选，纵轴为概率；需一眼看出"形状变化而非排序变化" |
 | top_k vs top_p 截断对比图 | 第 3–4 节交界 | Excalidraw→PNG | 左：top_k 固定砍到剩 4 个（数量固定）；右：top_p 累积到 90% 自适应保留（数量随分布变）；手绘风、圆角、手写字体 |
 | 速查表 | 第 7 节 | 原生表格 | 参数 / 作用对象 / 机制 / 典型取值 / 一句话效果 |
@@ -88,7 +90,8 @@ mermaid: true
 
 ## 五、事实核查清单（写作前必须坐实）
 
-- [ ] **执行顺序**：HuggingFace `generate` 中 `TemperatureLogitsWarper` / `TopKLogitsWarper` / `TopPLogitsWarper` 的实际注册与执行顺序（以 `src/transformers/generation/logits_process.py` + `_get_logits_processor` 为准，勿凭记忆）
+- [x] **执行顺序**（已核到结论）：主流顺序 = **`重复惩罚 → 温度 → top_k → top_p → (min_p)`**（依据：HuggingFace **Swift 版官方文档**明确标注此链，并注明"温度在重复惩罚之后、过滤之前"）。**顺序随版本而变**——老版 HF Python（v3.5.1）`_get_logits_warper` 为 `top_k → top_p → temperature`，与现行相反。
+  - [ ] **剩余**：确认**当前 HF Python 版** `_get_logits_warper` 的顺序并记录版本号（正文以当前版为准，脚注说明版本差异）
 - [ ] **框架差异**：vLLM（或 SGLang）等推理引擎中三者的默认顺序，是否与 HF 一致
 - [ ] **`temperature=0` 的处理**：HF / 主流服务框架如何特判（是否转极小值、是否走 greedy）
 - [ ] **核采样出处**：Holtzman et al. 2019《The Curious Case of Neural Text Degeneration》——核对标题与年份
@@ -109,10 +112,11 @@ mermaid: true
 - [ ] **Step 4**：把结论整成一段"顺序说明"，供第 5 节直接引用
 
 ### Task 2: 生成配图
-**Files:** Create `assets/img/llm-sampling-params/` 下两张 PNG。
-- [ ] **Step 1**：生成"温度三合一分布图"（T=0.5/1.0/2.0 对比，需体现形状变化）
-- [ ] **Step 2**：用 Excalidraw 画"top_k vs top_p 截断对比图"（圆角 + 手写字体），导出 PNG
-- [ ] **Step 3**：确认图片存在于对应目录、文件名无空格
+**Files:** Create `assets/img/llm-sampling-params/` 下的图片与 Excalidraw 源文件。
+- [ ] **Step 1（执行顺序图）**：先用 mermaid 出草图 → 站长确认构图 → 转 Excalidraw 手绘（圆角 + 手写字体），源文件存 `sampling-order-pipeline.excalidraw`
+- [ ] **Step 2（温度图）**：生成"温度三合一分布图"（T=0.5/1.0/2.0 对比，需体现形状变化），存 `temperature-distribution.png`
+- [ ] **Step 3（截断对比图）**：用 Excalidraw 画"top_k vs top_p 截断对比图"（圆角 + 手写字体），源文件存 `topk-vs-topp.excalidraw`
+- [ ] **Step 4**：确认源文件/图片位于对应目录、文件名无空格；**两张 Excalidraw 的 PNG 由站长导出**，且提交前必须已存在
 
 ### Task 3: 撰写正文
 **Files:** Create `_posts/2026-XX-XX-llm-sampling-params.md`
@@ -140,6 +144,6 @@ git push
 ## 七、开放项（待定）
 
 - [x] **标题**：已定稿 —— 《LLM 是怎么"掷骰子"的：温度、`top_p`、`top_k` 到底在控制什么？》
-- [ ] **`min_p`**：是否在结尾作一句延伸提及（默认：提一句，不展开）
+- [x] **`min_p`**：已定 —— 结尾提一句，不展开（注意与 `top_p` 的区别：锚定相对峰值 vs 绝对总量）
 - [ ] **post 日期/slug**：发文时按推送时刻确定（slug 默认 `llm-sampling-params`）
 - [ ] **星图视觉**：`edge.inference` 升为 seeded 后，是否需要额外确认星图渲染（改动仅 posts/status，预计无需改 SVG 组件）
