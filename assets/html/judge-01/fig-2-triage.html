@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图二 · 判分分流图</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j1-flow">
+<div class="j1-row"><div class="j1-node">一条检查项</div></div>
+<div class="j1-arrow"></div>
+<div class="j1-row"><div class="j1-node j1-q">判定结果是否唯一？</div></div>
+<div class="j1-split">
+<div class="j1-col"><div class="j1-tag j1-tag-yes">是 · 答案不因人 / 因模型而异</div><div class="j1-arrow"></div><div class="j1-node j1-ok">程序断言<span class="j1-sub">脚本判定 · 零噪声</span></div></div>
+<div class="j1-col"><div class="j1-tag j1-tag-no">否 · 存在合理分歧空间</div><div class="j1-arrow"></div><div class="j1-node j1-q">红线能否枚举完全？</div><div class="j1-split j1-inner"><div class="j1-col"><div class="j1-tag j1-tag-yes">能枚举</div><div class="j1-arrow"></div><div class="j1-node j1-ok">拆成一组断言</div></div><div class="j1-col"><div class="j1-tag j1-tag-no">枚举不完</div><div class="j1-arrow"></div><div class="j1-node j1-model">模型代判<span class="j1-sub">rubric 里给出判定标准</span></div></div></div></div>
+</div>
+<div class="j1-note">判据只有一条：判定结果是否唯一。"难不难"不参与这条分流。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j1-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

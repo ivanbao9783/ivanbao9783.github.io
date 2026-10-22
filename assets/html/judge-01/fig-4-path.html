@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图四 · 全篇路径回顾</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j1-flow">
+<div class="j1-steps">
+<div class="j1-step"><div class="j1-node">① 读数据<span class="j1-sub">产出失败分类法</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node">② 划边界<span class="j1-sub">按唯一性分流</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node">③ 选形态<span class="j1-sub">判别力 × 成本</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node">④ 定节奏<span class="j1-sub">三层 eval</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node j1-c-green">⑤ 写 rubric 与 prompt<span class="j1-sub">到这里才轮到它</span></div></div>
+</div>
+<div class="j1-note">prompt 出现在最后一步——这就是本文的全部主张。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j1-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

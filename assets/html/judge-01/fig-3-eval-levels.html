@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图三 · 三层 eval 的节奏</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j1-flow">
+<div class="j1-row"><div class="j1-node j1-c-blue j1-w">⚡ Level 1 · 单测 / 断言<span class="j1-sub">成本：极低 · 节奏：每次提交</span></div></div>
+<div class="j1-tag">成本递增 · 频率递减</div>
+<div class="j1-arrow"></div>
+<div class="j1-row"><div class="j1-node j1-c-amber j1-w">🔬 Level 2 · 人工 + 模型评测<span class="j1-sub">成本：高 · 节奏：每次发版 / 定期</span></div></div>
+<div class="j1-tag">成本递增 · 频率递减</div>
+<div class="j1-arrow"></div>
+<div class="j1-row"><div class="j1-node j1-c-green j1-w">🧪 Level 3 · A/B 实验<span class="j1-sub">成本：最高 · 节奏：有足够流量时</span></div></div>
+<div class="j1-note">成本差着数量级，所以频率必须跟着成本走——节奏是算出来的，不是偏好定的。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j1-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

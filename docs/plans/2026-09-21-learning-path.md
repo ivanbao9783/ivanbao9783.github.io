@@ -38,7 +38,7 @@
 #### paradigm 评测范式（deep · 持续深耕）
 
 - **学习目标**：系统掌握从静态 benchmark 到 agentic 评测的范式演进；深入 LLM-as-judge 的偏差与校准
-- **产出标准**：补 1 篇 LLM-as-judge 偏差与校准专题；P3 输出范式选型方法论
+- **产出标准**：LLM-as-judge 偏差与校准专项展开为独立子系列 `judge-01`~`judge-09`（6 里程碑 9 篇，见 [LLM-as-Judge 裁判模型专项规划](2026-10-21-llm-as-judge-learning-path.md)）；P3 输出范式选型方法论
 - **面试考点速记**：
   - 范式演进：静态基准 → 动态/交互式 → agentic
   - LLM-as-judge 偏差类型：位置偏差 / 长度偏差 / 自我偏好

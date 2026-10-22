@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图一 · 一次错误分析的工作流</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j1-flow">
+<div class="j1-steps">
+<div class="j1-step"><div class="j1-node">🎯 抽样 50–200 条<span class="j1-sub">覆盖好 / 中 / 差</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node">📖 逐条读<span class="j1-sub">输入 + 输出 + 轨迹</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node">🏷️ 打标签<span class="j1-sub">一条失败可挂多个标签</span></div></div>
+<div class="j1-link"></div>
+<div class="j1-step"><div class="j1-node">🧩 聚类归并<span class="j1-sub">抽代表样本</span></div></div>
+</div>
+<div class="j1-out">
+<div class="j1-node j1-c-green">📋 失败分类法<span class="j1-sub">本文后续所有篇目的公共坐标系</span></div>
+<div class="j1-node j1-c-green">🗂️ 代表样本<span class="j1-sub">即 Golden Set 的第一批种子</span></div>
+</div>
+<div class="j1-note">前四步产出的是两样东西——都不是 prompt。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j1-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>
