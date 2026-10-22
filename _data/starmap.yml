@@ -7,13 +7,13 @@ theme_default: paper # paper(羊皮纸/atlas) | space(深空/celestial)
 clusters:
   - id: eval-system
     title: 评测系统
-    ellipse: { cx: 270, cy: 430, rx: 250, ry: 300 }
+    ellipse: { cx: 262, cy: 445, rx: 196, ry: 296 }
     nodes:
       - id: harness
         title: 评测框架
         status: deep
-        x: 300
-        y: 265
+        x: 295
+        y: 280
         posts:
           - 2026-07-15-agent-eval-harness.md
           - 2026-07-15-agent-eval-02-evalscope.md
@@ -23,30 +23,30 @@ clusters:
       - id: paradigm
         title: 评测范式
         status: deep
-        x: 150
-        y: 420
+        x: 160
+        y: 400
         posts:
           - 2026-07-15-agent-eval-01-paradigm-shift.md
           - 2026-07-24-eval-system-llm-to-agent-judge.md
       - id: hotspot
         title: 评测热点
         status: seeded
-        x: 320
-        y: 515
+        x: 325
+        y: 480
         posts:
           - 2026-07-24-eval-hotspot-openai-hf-jailbreak.md
       - id: hardware
         title: 硬件评测
         status: seeded
-        x: 135
-        y: 580
+        x: 170
+        y: 550
         posts:
           - 2026-07-15-eval-system-aa-agentperf.md
       - id: performance
         title: 性能评测
         status: planned
-        x: 380
-        y: 655
+        x: 365
+        y: 615
         posts: []
   - id: dataset
     title: 数据集
@@ -80,20 +80,20 @@ clusters:
           - 2026-08-19-eval-data-mini-data-compression.md
   - id: scoring
     title: 评分与诊断
-    ellipse: { cx: 690, cy: 550, rx: 160, ry: 150 }
+    ellipse: { cx: 678, cy: 578, rx: 155, ry: 170 }
     nodes:
       - id: judge
         title: 裁判体系
         status: seeded
-        x: 610
-        y: 495
+        x: 720
+        y: 510
         posts:
           - 2026-10-22-judge-01-define-failure-first.md
       - id: metrics
         title: Rubric 与指标设计
         status: planned
-        x: 700
-        y: 510
+        x: 610
+        y: 495
         posts: []
       - id: observability
         title: 可观测性
@@ -119,32 +119,32 @@ clusters:
           - 2026-10-12-automationbench-effort-regression.md
   - id: edge
     title: 周边领域
-    ellipse: { cx: 1075, cy: 540, rx: 200, ry: 185 }
+    ellipse: { cx: 1056, cy: 553, rx: 190, ry: 178 }
     nodes:
       - id: agent
         title: Agent 知识
         status: planned
-        x: 980
-        y: 455
+        x: 998
+        y: 480
         posts: []
       - id: model-arch
         title: 模型结构
         status: planned
-        x: 1140
-        y: 445
+        x: 1106
+        y: 472
         posts: []
       - id: inference
         title: 推理知识
         status: seeded
-        x: 960
-        y: 635
+        x: 990
+        y: 604
         posts:
           - 2026-10-13-llm-sampling-params.md
       - id: training
         title: 训练知识
         status: planned
-        x: 1135
-        y: 645
+        x: 1102
+        y: 612
         posts: []
 
 edges:
