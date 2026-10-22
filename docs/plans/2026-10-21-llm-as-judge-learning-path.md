@@ -1,6 +1,6 @@
 # 学习路径 · LLM-as-Judge 裁判模型专项
 
-> 本专项是 `docs/plans/2026-09-21-learning-path.md` 中 **paradigm（评测范式）** 节点「LLM-as-judge 偏差与校准」一条的展开，与 **metrics（Rubric 与指标设计）** 节点交叉。
+> 本专项是知识星图 **scoring（评分与诊断）→ judge（裁判体系）** 星球的内容主体；与 **eval-system.paradigm（评测范式）**、**scoring.metrics（Rubric 与指标设计）** 两个节点交叉。
 > 私有规划（`docs/` 已被 `_config.yml` exclude，不公开渲染）；站点侧只留博文，零规划痕迹。
 > 博文归属：新建独立子系列 `judge-XX`，类目沿用 `评测系统`。
 > 篇目不是"想写几篇"，而是**业内优秀资料实际覆盖面的映射结果**（见第 2 节覆盖地图）。
@@ -208,7 +208,7 @@
   - rubric 自审漂移的机制与治理：Shapley 归因可给出每条 check 的 catch credit / false-fail blame / unique catches，配合变更门禁 + 来源冻结把漂移链钉回起点质量。
   - Agent 场景的转移：outcome 与 process（轨迹）的分工、rubric 在 agentic 场景的可靠性、batching 与多数投票对 rubric 验证的影响、多次 trial 处理随机性。
   - 裁判看得见终点，轨迹诊断是下一层范式：与 `agent-eval` 系列、`Agent-as-a-Judge` 专题的衔接。
-- **产出标准**：`judge-09` 发布即达成；本专项关闭时同步更新 `_domains/eval-system/paradigm.md` 的产出标准与 `_data/starmap.yml` 状态。
+- **产出标准**：`judge-09` 发布即达成；本专项关闭时同步更新 `_domains/scoring/judge.md` 的产出标准与 `_data/starmap.yml` 状态。
 - **能力锚点**：judge 的攻击面清单；自审漂移的检测与门禁；reward hacking 的识别信号；轨迹级评测的接入点。
 
 ---
@@ -264,7 +264,7 @@
 
 - **数字必须可溯源**：标明来源 + 被测模型版本 + 数据集规模。二手引述（"据某综述引述"）要显式标注为转引，不与自己实测的数据混用。
 - **front matter**：`categories: [评测系统]`，`tags` 至少含 `LLM-as-Judge` 与子系列标识；含 mermaid 图必须 `mermaid: true`。
-- **配图**：存 `assets/img/<post-slug>/`，文件名不含空格，站内引用用 `/assets/img/<post-slug>/<file>`。
+- **配图**：流程图/结构图存 `assets/html/<post-slug>/`（多图共享一份 `fig-style.css`），博文内以 `<iframe>` 引用并配高度上报脚本（做法同 judge-01）；需要光栅图时存 `assets/img/<post-slug>/`。文件名不含空格。
 - **日期纪律**：post 的 `date` 必须**早于实际推送时间**，否则会被 `future: false` 静默跳过（详见 project memory）。
 - **本地不验证构建**：交给 GitHub Actions CI 验证，不做本地 `bundle exec jekyll build`。
 - **不做纯综述**：每篇至少给一个可执行产出（表格 / 检查清单 / 决策树 / 脚本骨架），否则不写。

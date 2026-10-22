@@ -20,4 +20,4 @@ node: paradigm
 
 **已有实践**：范式迁移、LLM-to-Agent-Judge，见本页博文列表。
 
-**后续规划**：judge 偏差与校准专题。
+**后续规划**：judge 偏差与校准已独立成子系列，落到 **评分与诊断 / 裁判体系** 节点（见 [裁判体系](/domains/scoring/judge/)）。

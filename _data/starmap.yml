@@ -82,6 +82,13 @@ clusters:
     title: 评分与诊断
     ellipse: { cx: 690, cy: 550, rx: 160, ry: 150 }
     nodes:
+      - id: judge
+        title: 裁判体系
+        status: seeded
+        x: 610
+        y: 495
+        posts:
+          - 2026-10-22-judge-01-define-failure-first.md
       - id: metrics
         title: Rubric 与指标设计
         status: planned
@@ -145,3 +152,7 @@ edges:
     to: scoring.metrics
     type: method
     label: 评判方法
+  - from: scoring.metrics
+    to: scoring.judge
+    type: method
+    label: 判卷标准

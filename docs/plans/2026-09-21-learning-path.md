@@ -8,7 +8,7 @@
 
 | 优先级 | 主题 | 节点任务 |
 |---|---|---|
-| P0 | 评分指标体系 | metrics: planned → deep |
+| P0 | 评分指标体系 | metrics: planned → deep；judge: seeded → deep |
 | P0 | 诊断能力深耕 | observability → deep、anomaly → deep |
 | P1 | 数据集构建与数据质量 | construction → deep、compression → deep、hotspot → deep |
 | P2 | Agent 知识 | agent → seeded |
@@ -20,7 +20,7 @@
 - 外圈节点（agent/inference/training/model-arch）与 performance 到 seeded 即止
 - P3 建议在 P0-P2 主体完成后启动，详细设计届时单独脑暴
 
-## 2. 全节点夯实计划（15/15）
+## 2. 全节点夯实计划（16/16）
 
 ### 2.1 评测系统（核心圈）
 
@@ -38,7 +38,7 @@
 #### paradigm 评测范式（deep · 持续深耕）
 
 - **学习目标**：系统掌握从静态 benchmark 到 agentic 评测的范式演进；深入 LLM-as-judge 的偏差与校准
-- **产出标准**：LLM-as-judge 偏差与校准专项展开为独立子系列 `judge-01`~`judge-09`（6 里程碑 9 篇，见 [LLM-as-Judge 裁判模型专项规划](2026-10-21-llm-as-judge-learning-path.md)）；P3 输出范式选型方法论
+- **产出标准**：P3 输出范式选型方法论；LLM-as-judge 偏差与校准已独立为 `scoring.judge` 裁判体系子系列（见 [LLM-as-Judge 裁判模型专项规划](2026-10-21-llm-as-judge-learning-path.md)）
 - **面试考点速记**：
   - 范式演进：静态基准 → 动态/交互式 → agentic
   - LLM-as-judge 偏差类型：位置偏差 / 长度偏差 / 自我偏好
@@ -116,6 +116,17 @@
   - 确定性指标 vs LLM-judge：适用场景、成本、可复现性
   - pass@k、consensus@k 等指标的定义与计算
   - CI 门禁指标选择原则：确定性、低延迟（门禁用）、LLM-judge（趋势分析用）
+- **自定补充**：（站长追加）
+
+#### judge 裁判体系（seeded → deep · P0）
+
+- **学习目标**：把 LLM-as-Judge 做成可信的生产组件——判分边界划得清、rubric 可判定、偏差可量化、与人对账、聚合有依据、换尺子有版本治理
+- **产出标准**：`judge-01`~`judge-09` 九篇子系列（6 里程碑），累计 ≥2 篇升 deep。详见 [LLM-as-Judge 裁判模型专项规划](2026-10-21-llm-as-judge-learning-path.md)
+- **面试考点速记**：
+  - 判分边界：判据是判定唯一性 → 唯一走断言、不唯一走模型
+  - 四种评分形态：程序断言 / 单点打分 / 成对比较 / 参考物比对
+  - 偏差分层：prompt 层可修、模型偏好层只能改测量、权重层只能换裁判
+  - 一致性统计：一致率 / κ / Gwet's AC1 / ICC，κ 悖论与报告纪律
 - **自定补充**：（站长追加）
 
 #### observability 可观测性（seeded → deep · P0）
