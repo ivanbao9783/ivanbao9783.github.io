@@ -84,11 +84,12 @@ clusters:
     nodes:
       - id: judge
         title: 裁判体系
-        status: seeded
+        status: deep
         x: 720
         y: 510
         posts:
           - 2026-10-22-judge-01-define-failure-first.md
+          - 2026-10-22-judge-02-rubric-as-assertions.md
       - id: metrics
         title: Rubric 与指标设计
         status: planned

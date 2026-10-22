@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图三 · 裁判拿到什么，决定它测什么</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j2-fig">
+  <div class="j2-head">同一句话，换一种输入，测的就不是同一件事</div>
+
+  <div class="j2-mat">
+    <div class="j2-mat-h lbl"></div>
+    <div class="j2-mat-h ok">材料随题下发</div>
+    <div class="j2-mat-h bad">只给回答</div>
+
+    <div class="j2-mat-k">裁判做的是</div>
+    <div class="j2-mat-c">对账：订单记录 + 协议原文，逐项核对</div>
+    <div class="j2-mat-c">回忆：调用预训练里的政策印象</div>
+
+    <div class="j2-mat-k">它判的是</div>
+    <div class="j2-mat-c">回答与材料是否一致</div>
+    <div class="j2-mat-c">它自己记住了哪一版政策</div>
+
+    <div class="j2-mat-k">结果</div>
+    <div class="j2-mat-c">换裁判也差不了几个点</div>
+    <div class="j2-mat-c">同一条样本反复判不一致</div>
+  </div>
+
+  <div class="j2-note">同一份 rubric、同一个裁判，唯一的变量是输入。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j2-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

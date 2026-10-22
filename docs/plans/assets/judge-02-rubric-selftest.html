@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>可判定性自检 · rubric 分歧定位</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --ink: #33383f; --muted: #767d88; --line: #e3e0d8; --paper: #fbf9f4;
+    --blue: #5b7fa6; --blue-deep: #3d5f87; --green: #4f8a78;
+    --orange: #b08450; --orange-deep: #8a6236; --red: #b3564f;
+  }
+  body {
+    margin: 0; padding: 28px 20px 60px; background: #f4f1ea; color: var(--ink);
+    font-family: system-ui, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.7;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 1.35rem; margin: 0 0 6px; }
+  .lede { color: var(--muted); font-size: 0.9rem; margin: 0 0 22px; }
+  .lede code { background: #ebe7dc; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+  .card {
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 22px; box-shadow: 0 4px 16px rgba(59, 47, 20, 0.05);
+  }
+  .bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .bar .track { flex: 1; height: 6px; background: #eee9dd; border-radius: 3px; overflow: hidden; }
+  .bar .fill { height: 100%; width: 0; background: var(--blue); transition: width .2s ease; }
+  .bar .num { font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .utter { background: var(--paper); border-left: 3px solid var(--line); padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: 12px; }
+  .utter .who { font-size: 0.76rem; letter-spacing: .06em; color: var(--muted); }
+  .utter p { margin: 2px 0 0; }
+  .reply { border-left-color: var(--blue); }
+  .reply .who { color: var(--blue-deep); }
+
+  .check { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px dashed var(--line); }
+  .check:first-of-type { border-top: none; }
+  .check .q { font-size: 0.92rem; }
+  .check .k { color: var(--muted); font-size: 0.78rem; margin-right: 6px; font-variant-numeric: tabular-nums; }
+  .opts { display: flex; gap: 6px; }
+  .opt {
+    border: 1px solid var(--line); background: #fff; color: var(--ink);
+    border-radius: 6px; padding: 4px 11px; font-size: 0.85rem; cursor: pointer;
+    transition: all .12s ease; font-family: inherit; white-space: nowrap;
+  }
+  .opt:hover { border-color: #b9b2a4; }
+  .opt.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .opt.on.neg { background: #8d949e; border-color: #8d949e; }
+  .opt.on.unk { background: var(--orange); border-color: var(--orange); }
+
+  .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; gap: 12px; }
+  .hint { font-size: 0.8rem; color: var(--muted); }
+  .next {
+    border: none; background: var(--blue-deep); color: #fff; padding: 8px 22px;
+    border-radius: 6px; font-size: 0.9rem; cursor: pointer; font-family: inherit;
+  }
+  .next:disabled { background: #c9cdd4; cursor: not-allowed; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 4px 0 18px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.8rem; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+  td.n { font-variant-numeric: tabular-nums; }
+  .tag { display: inline-block; font-size: 0.78rem; padding: 1px 8px; border-radius: 20px; }
+  .tag.ok { background: rgba(79, 138, 120, .12); color: #35695a; }
+  .tag.warn { background: rgba(176, 132, 80, .14); color: var(--orange-deep); }
+  .tag.bad { background: rgba(179, 86, 79, .12); color: var(--red); }
+  h2 { font-size: 1.05rem; margin: 24px 0 10px; }
+  .take { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; font-size: 0.92rem; }
+  .take b { color: var(--blue-deep); }
+  .divlist { font-size: 0.86rem; color: var(--muted); margin: 0; padding-left: 18px; }
+  .divlist li { margin: 3px 0; }
+  .hidden { display: none; }
+  .restart { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 7px 16px; cursor: pointer; font-family: inherit; font-size: 0.86rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>rubric 可判定性自检</h1>
+  <p class="lede">
+    你扮演标注员 A，逐条判定 12 条客服回复。<b>标注员 B 的答案已内置</b>（模拟第二位标注员，固定不变）。
+    判完看每个检查项的一致率——<b>分歧集中在哪一条，哪一条就不可判定</b>。
+    键盘 <code>1</code> 是 / <code>2</code> 否 / <code>3</code> 无法判断，<code>Enter</code> 下一条。
+  </p>
+
+  <div id="stage-quiz" class="card">
+    <div class="bar">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span class="num" id="progress">1 / 12</span>
+    </div>
+    <div id="sample"></div>
+    <div class="foot">
+      <span class="hint" id="hint">本条第 1/5 项</span>
+      <button class="next" id="next" disabled>下一条</button>
+    </div>
+  </div>
+
+  <div id="stage-result" class="hidden">
+    <div class="card">
+      <h2 style="margin-top:0">检查项诊断</h2>
+      <table>
+        <thead><tr><th>#</th><th>检查项</th><th>一致率</th><th>你的「无法判断」率</th><th>诊断</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <h2>你与 B 的分歧点</h2>
+      <ul class="divlist" id="divs"></ul>
+      <h2>读数</h2>
+      <div class="take" id="take"></div>
+      <div class="foot" style="margin-top:20px">
+        <span class="hint">同一组数据固定不变，可反复重判对比。</span>
+        <button class="restart" id="restart">重判一次</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHECKS = [
+  { key: "C1", short: "明确结论", q: "回复是否明确给出「可以退 / 不可以退」的结论？" },
+  { key: "C2", short: "引用条款", q: "回复是否引用了具体的政策条款编号或条款名？" },
+  { key: "C3", short: "超范围补偿", q: "回复是否承诺了政策范围外的赔偿或补偿？" },
+  { key: "C4", short: "方案全面合理", q: "回复给出的方案是否全面且合理？" },
+  { key: "C5", short: "下一步操作", q: "回复是否给出具体到「做什么、找谁」的下一步操作？" }
+];
+
+// b: 模拟标注员 B 的判定，顺序同 CHECKS。1=是 2=否 3=无法判断
+const SAMPLES = [
+  {
+    u: "买的耳机第 3 天发现左耳没声音，想退款。",
+    r: "可以退款。根据《七天无理由退货政策》第 3 条，签收 7 日内非人为损坏可申请全额退款。请在订单页点击「申请退货」并选择「商品质量问题」，我们优先审核。",
+    b: [1, 1, 2, 2, 1]
+  },
+  {
+    u: "超过保修期两个月，屏幕自己裂了，能退吗？",
+    r: "不能退款。由于已超过保修期，按规定不再支持退货退款。建议您联系官方维修网点检测。",
+    b: [1, 2, 2, 2, 1]
+  },
+  {
+    u: "快递把包装压坏了，里面机器没事，能补偿吗？",
+    r: "非常抱歉给您带来不好的体验，这种情况我们会为您申请一定补偿，请耐心等待。",
+    b: [2, 2, 1, 2, 2]
+  },
+  {
+    u: "我想退会员年费，已用 3 个月。",
+    r: "可以退剩余费用。依据《会员服务协议》第 5 条，未使用部分可按月折算退还。剩余 9 个月费用将在 3 个工作日内原路退回。",
+    b: [1, 1, 2, 1, 1]
+  },
+  {
+    u: "锅具用了半年掉漆，能换新吗？",
+    r: "可以换新。依据《质保条款》第 2 条，6 个月内非人为掉漆属于质量问题。请拍摄掉漆部位照片并在订单页提交售后申请。",
+    b: [1, 1, 2, 1, 1]
+  },
+  {
+    u: "我下错单了，刚付款 5 分钟，能取消吗？",
+    r: "可以的，已经为您取消订单，款项将在 1-3 个工作日退回。",
+    b: [1, 2, 2, 2, 1]
+  },
+  {
+    u: "商品比页面描述小了一号，能退吗？",
+    r: "理解您的困扰。商品尺寸以实物为准，页面描述仅供参考，我们已记录您的反馈。",
+    b: [2, 2, 2, 2, 2]
+  },
+  {
+    u: "空调装好后噪音很大，退货要拆机费吗？",
+    r: "可以退货。依据《大家电退货规则》第 4 条，质量问题退货免收拆机费。已为您预约明天上门拆机，不收取任何费用。",
+    b: [1, 1, 2, 1, 1]
+  },
+  {
+    u: "想退掉昨天买的书，已经拆封了。",
+    r: "可以退货。根据《图书退换规则》，拆封图书如无质量问题不支持退货，但可为您申请一次特殊处理。",
+    b: [1, 1, 2, 2, 2]
+  },
+  {
+    u: "积分兑换的礼品能退吗？",
+    r: "抱歉，积分兑换商品不支持退货，这是平台统一规则。您可以选择联系客服申请积分返还。",
+    b: [1, 2, 2, 2, 1]
+  },
+  {
+    u: "手机在保修期内坏了两次，想直接退。",
+    r: "可以为您办理退货。依据《三包规定》第 11 条，保修期内同一故障维修两次仍不能正常使用的，可要求退货。请在订单页提交维修记录。",
+    b: [1, 1, 2, 1, 1]
+  },
+  {
+    u: "跨境买的奶粉能退吗？",
+    r: "跨境商品清关后不支持无理由退货，但若存在质量问题可协助您走海外售后流程。",
+    b: [1, 2, 2, 2, 2]
+  }
+];
+
+const LABEL = { 1: "是", 2: "否", 3: "无法判断" };
+let idx = 0;
+let answers = [];   // answers[i] = [c1,c2,c3,c4,c5] or []
+
+const $ = (id) => document.getElementById(id);
+
+function render() {
+  const s = SAMPLES[idx];
+  const cur = answers[idx] || [];
+  $("progress").textContent = (idx + 1) + " / " + SAMPLES.length;
+  $("fill").style.width = (idx / SAMPLES.length * 100) + "%";
+  let html = '<div class="utter"><div class="who">用户诉求</div><p>' + s.u + "</p></div>";
+  html += '<div class="utter reply"><div class="who">Agent 回复</div><p>' + s.r + "</p></div>";
+  CHECKS.forEach((c, i) => {
+    html += '<div class="check"><div class="q"><span class="k">' + c.key + "</span>" + c.q + "</div><div class=\"opts\">";
+    [1, 2, 3].forEach((v) => {
+      const cls = v === 2 ? "neg" : v === 3 ? "unk" : "";
+      const on = cur[i] === v ? " on " + cls : "";
+      html += '<button class="opt' + on + '" data-i="' + i + '" data-v="' + v + '">' + LABEL[v] + "</button>";
+    });
+    html += "</div></div>";
+  });
+  $("sample").innerHTML = html;
+  const done = cur.filter((x) => x).length;
+  $("hint").textContent = "本条已判 " + done + "/5 项" + (idx === SAMPLES.length - 1 ? " · 最后一条" : "");
+  $("next").disabled = done < CHECKS.length;
+  $("next").textContent = idx === SAMPLES.length - 1 ? "看结果" : "下一条";
+}
+
+function pick(i, v) {
+  if (!answers[idx]) answers[idx] = [];
+  answers[idx][i] = v;
+  render();
+}
+
+$("sample").addEventListener("click", (e) => {
+  const btn = e.target.closest(".opt");
+  if (btn) pick(+btn.dataset.i, +btn.dataset.v);
+});
+
+$("next").addEventListener("click", () => {
+  if (idx < SAMPLES.length - 1) { idx++; render(); }
+  else finish();
+});
+
+document.addEventListener("keydown", (e) => {
+  if ($("stage-quiz").classList.contains("hidden")) return;
+  if (e.key === "1" || e.key === "2" || e.key === "3") {
+    const cur = answers[idx] || [];
+    const nextEmpty = CHECKS.findIndex((c, i) => !cur[i]);
+    if (nextEmpty >= 0) pick(nextEmpty, +e.key);
+  } else if (e.key === "Enter" && !$("next").disabled) {
+    $("next").click();
+  }
+});
+
+function finish() {
+  $("stage-quiz").classList.add("hidden");
+  $("stage-result").classList.remove("hidden");
+
+  const rows = CHECKS.map((c, i) => {
+    let agree = 0, unk = 0;
+    SAMPLES.forEach((s, n) => {
+      const a = answers[n][i];
+      if (a === s.b[i]) agree++;
+      if (a === 3) unk++;
+    });
+    const rate = agree / SAMPLES.length;
+    const unkRate = unk / SAMPLES.length;
+    let tag, cls;
+    if (unkRate >= 0.5) { tag = "缺判据：你判不了"; cls = "bad"; }
+    else if (rate < 0.6) { tag = "判据不稳：各判各的"; cls = "bad"; }
+    else if (rate < 0.8) { tag = "边界模糊"; cls = "warn"; }
+    else { tag = "可判定"; cls = "ok"; }
+    return { c, rate, unkRate, tag, cls };
+  });
+
+  $("tbody").innerHTML = rows.map((r, i) =>
+    "<tr><td class='n'>" + r.c.key + "</td><td>" + r.c.short + "</td>" +
+    "<td class='n'>" + Math.round(r.rate * 100) + "%</td>" +
+    "<td class='n'>" + Math.round(r.unkRate * 100) + "%</td>" +
+    "<td><span class='tag " + r.cls + "'>" + r.tag + "</span></td></tr>"
+  ).join("");
+
+  // 分歧明细（最多 10 条）
+  const divs = [];
+  SAMPLES.forEach((s, n) => {
+    CHECKS.forEach((c, i) => {
+      if (answers[n][i] !== s.b[i]) {
+        divs.push("样本 " + (n + 1) + " · " + c.key + " " + c.short + "：你判「" + LABEL[answers[n][i]] + "」，B 判「" + LABEL[s.b[i]] + "」");
+      }
+    });
+  });
+  $("divs").innerHTML = divs.length
+    ? divs.slice(0, 10).map((d) => "<li>" + d + "</li>").join("") +
+      (divs.length > 10 ? "<li>…共 " + divs.length + " 处分歧</li>" : "")
+    : "<li>无分歧</li>";
+
+  const worst = rows.slice().sort((a, b) => a.rate - b.rate)[0];
+  const unkMost = rows.slice().sort((a, b) => b.unkRate - a.unkRate)[0];
+  let msg = "分歧最集中的是 <b>" + worst.c.key + " " + worst.c.short + "</b>（一致率 " +
+    Math.round(worst.rate * 100) + "%）。";
+  if (unkMost.unkRate > 0.3) {
+    msg += " 你在这条上用了 " + Math.round(unkMost.unkRate * 100) +
+      "% 的「无法判断」（<b>" + unkMost.c.key + " " + unkMost.c.short +
+      "</b>）——这通常不是你没想清楚，而是这条标准没给你可观察的对象或可依据的材料。";
+  }
+  msg += " 把这几条改写成可观察的 TRUE/FALSE，再看一致率是否上升——这就是 judge-02 要做的事。";
+  $("take").innerHTML = msg;
+}
+
+$("restart").addEventListener("click", () => {
+  idx = 0; answers = [];
+  $("stage-result").classList.add("hidden");
+  $("stage-quiz").classList.remove("hidden");
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

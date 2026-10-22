@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图五 · 全篇路径回顾</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j2-fig">
+  <div class="j2-steps">
+    <div class="j2-step"><div class="j2-node">① 补三要素<span class="j2-sub">观察 / 正反例 / 不扣分</span></div></div>
+    <div class="j2-link"></div>
+    <div class="j2-step"><div class="j2-node">② 换判据<span class="j2-sub">形容词 → 可指认</span></div></div>
+    <div class="j2-link"></div>
+    <div class="j2-step"><div class="j2-node">③ 定档位<span class="j2-sub">二元优先，权重表优先级</span></div></div>
+    <div class="j2-link"></div>
+    <div class="j2-step"><div class="j2-node">④ 给材料<span class="j2-sub">证据随题下发</span></div></div>
+    <div class="j2-link"></div>
+    <div class="j2-step"><div class="j2-node j2-green">⑤ 管漂移<span class="j2-sub">只删不加 · 来源冻结</span></div></div>
+  </div>
+  <div class="j2-note">五步改的都是 rubric，模型一个都没换——这就是本篇的全部主张。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j2-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

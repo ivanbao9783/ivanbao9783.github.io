@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图四 · 严格度的来源</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j2-fig">
+  <div class="j2-head">同一批"本来就正确"的报告，换 rubric 来源就换一把尺子</div>
+
+  <div class="j2-bars">
+    <div class="j2-bar-row">
+      <div class="j2-bar-l">人工手写检查项</div>
+      <div class="j2-bar-t"><div class="j2-bar-f" style="width:97%;background:var(--j2-green-bd)"></div></div>
+      <div class="j2-bar-v" style="color:var(--j2-green-ink)">96–98%</div>
+    </div>
+    <div class="j2-bar-row">
+      <div class="j2-bar-l">模型自动生成检查项</div>
+      <div class="j2-bar-t"><div class="j2-bar-f" style="width:5%;background:var(--j2-red-bd)"></div></div>
+      <div class="j2-bar-v" style="color:var(--j2-red-ink)">2–8%</div>
+    </div>
+    <div class="j2-scale"><div></div><div class="j2-axis"><span>0%</span><span>50%</span><span>100%</span></div><div></div></div>
+  </div>
+
+  <div class="j2-note" style="border-top:none;padding-top:4px;margin-top:10px">纵轴＝正确报告被判"通过"的比例。裁判模型是同一个，差的只是检查项由谁写出来。</div>
+
+  <div class="j2-head" style="margin-top:20px">把 rubric 交给模型"自审优化"之后</div>
+  <div class="j2-bars">
+    <div class="j2-bar-row">
+      <div class="j2-bar-l">自审前</div>
+      <div class="j2-bar-t"><div class="j2-bar-f" style="width:97%;background:var(--j2-green-bd)"></div></div>
+      <div class="j2-bar-v" style="color:var(--j2-green-ink)">97%</div>
+    </div>
+    <div class="j2-bar-row">
+      <div class="j2-bar-l">自审改写后</div>
+      <div class="j2-bar-t"><div class="j2-bar-f" style="width:6%;background:var(--j2-red-bd)"></div></div>
+      <div class="j2-bar-v" style="color:var(--j2-red-ink)">6%</div>
+    </div>
+  </div>
+
+  <div class="j2-note">自审倾向于"补需求、删覆盖检查"。尺子被悄悄换掉的证据只有一处：原来能过的正确报告，突然过不了了。</div>
+
+  <div class="j2-src">数据：Asgari et al., arXiv:2610.24971（2026）· 安全侦察报告任务 · SummEdits / RAGTruth</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j2-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

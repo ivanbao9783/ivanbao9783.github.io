@@ -62,8 +62,8 @@
 
 | 里程碑 | 主题 | 博文 | 状态 |
 |---|---|---|---|
-| M1 | 错误分析与判分边界 | judge-01 | drafted |
-| M2 | Rubric 原子化与可判定化 | judge-02 | planned |
+| M1 | 错误分析与判分边界 | judge-01 | published |
+| M2 | Rubric 原子化与可判定化 | judge-02 | published |
 | M3 | 偏差地图与分层去偏 | judge-03 | planned |
 | M4 | 人工对齐与一致性统计 | judge-04、judge-05 | planned |
 | M5 | 裁判选型与多裁判组合 | judge-06、judge-07 | planned |
@@ -243,7 +243,7 @@
 | 编号 | 建议文件名 | 标题方向 | 核心论点 | 必配图表 |
 |---|---|---|---|---|
 | judge-01 | `2026-10-22-judge-01-define-failure-first.md` | 先定义失败，再写尺子 | 错误分析 → 判分边界 → 评分形态选型；三层 eval 与运行节奏 | 失败分类法示例；断言 vs 模型代判分工图；四形态判别力/成本矩阵 |
-| judge-02 | `2026-XX-XX-judge-02-rubric-as-assertions.md` | 把 rubric 写成断言 | 原子化 TRUE/FALSE；需求一一对应；二元 vs 分档；自审会漂移 | 抽象目标→可观察检查项的降维示例；严格度由 rubric 决定的对比表 |
+| judge-02 | `2026-10-22-judge-02-rubric-as-assertions.md` | 把 rubric 写成断言 | 原子化 TRUE/FALSE；需求一一对应；二元 vs 分档；自审会漂移 | 抽象目标→可观察检查项的降维示例；严格度由 rubric 决定的对比表 |
 | judge-03 | `2026-XX-XX-judge-03-where-bias-lives.md` | 裁判的偏心住在哪一层 | prompt 层可修、偏好层只能改测量、权重层只能换裁判 | 偏差住址-量级-可修复性三列对照表；换序协议流程 |
 | judge-04 | `2026-XX-XX-judge-04-kappa-paradox.md` | 一致率 92%、κ 只有 0.31 | κ 悖论成因与 AC1/PABAK 替代；报告纪律 | 流行率-κ 曲线示意；同意矩阵与混淆矩阵示例 |
 | judge-05 | `2026-XX-XX-judge-05-judge-calibration.md` | 给裁判做体检 | Golden Set 校准全流程、验收阈值与失败归因顺序 | 校准流程图；指标选用决策图 |
@@ -251,6 +251,8 @@
 | judge-07 | `2026-XX-XX-judge-07-multi-judge-aggregation.md` | 多裁判投票真的更准吗 | 聚合收益/成本边界与偏差独立性条件；排名协议 | 成本-精度前沿曲线；偏差相关性→聚合失效示意 |
 | judge-08 | `2026-XX-XX-judge-08-judge-versioning.md` | 换裁判等于换尺子 | 版本治理、回放、分层抽检与 CI 门禁 | judge 版本号字段设计；门禁 vs 趋势项分工图 |
 | judge-09 | `2026-XX-XX-judge-09-adversarial-judge.md` | 当选手开始研究裁判 | judge 攻击面、rubric 自审漂移、Agent 场景延伸 | 攻击面清单图；Shapley 归因定位漂移检查示意 |
+
+> judge-02 附加资产：`docs/plans/assets/judge-02-rubric-selftest.html`（可判定性自检小工具，不发布；judge-05 做真实校准时可改样本复用）。
 
 **每篇统一结构**（沿用站内既有风格）
 

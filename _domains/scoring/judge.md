@@ -18,4 +18,4 @@ node: judge
 
 **代表工作**：Hamel Husain 的三层 eval、Anthropic 的 grader 分类学、Arize 的人机对齐 field guide、JudgeBiasBench 与 Judging the Judges 等去偏研究。
 
-**内容规划**：`judge-01`~`judge-09` 九篇子系列（先定义失败 → 划判分边界 → rubric 可判定化 → 偏差分层 → 一致性统计与校准 → 裁判选型与聚合 → 线上治理与对抗），执行中。相邻领域见 **Rubric 与指标设计**（判卷标准的通用写法）与 **评测范式**（判分方式随范式的演进）。
+**内容规划**：`judge-01`~`judge-09` 九篇子系列（先定义失败 → 划判分边界 → rubric 可判定化 → 偏差分层 → 一致性统计与校准 → 裁判选型与聚合 → 线上治理与对抗），执行中。已发布 `judge-01`（先定义失败）、`judge-02`（把 rubric 写成断言）。相邻领域见 **Rubric 与指标设计**（判卷标准的通用写法）与 **评测范式**（判分方式随范式的演进）。

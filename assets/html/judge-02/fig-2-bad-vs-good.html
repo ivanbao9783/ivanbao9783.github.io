@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图二 · 坏 rubric 与好 rubric 的逐条对照</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j2-fig">
+  <div class="j2-head">同一个需求，两把尺子</div>
+
+  <div class="j2-cmp">
+    <div class="j2-cmp-h bad">反例 · 评价词（判不准）</div>
+    <div class="j2-cmp-h good">正例 · 观察项（判得准）</div>
+
+    <div class="j2-cmp-c bad">回答是否准确无误</div>
+    <div class="j2-cmp-c good">是否引用《会员服务协议》第 N 条，且条款号与原文一致</div>
+
+    <div class="j2-cmp-c bad">回答是否完整覆盖用户需求</div>
+    <div class="j2-cmp-c good">是否分别回答了「能不能退」「退多少」「怎么退」三问</div>
+
+    <div class="j2-cmp-c bad">表述是否专业、得体</div>
+    <div class="j2-cmp-c good">是否出现禁用词表里的词（嗯 / 那个 / 大概吧）</div>
+
+    <div class="j2-cmp-c bad">是否真正帮助用户解决了问题</div>
+    <div class="j2-cmp-c good">是否给出操作入口（具体页面 + 按钮名）</div>
+  </div>
+
+  <div class="j2-note">右列每一项都能指着回答说"有"或"没有"；左列每一项，裁判都得先自己补一个标准。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j2-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图一 · 可判定 rubric 的三要素</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="j2-fig">
+  <div class="j2-head">一条 rubric 能让两个人判出同一个答案，靠的是这三样</div>
+
+  <div class="j2-grid j2-grid-3">
+    <div class="j2-card j2-blue">
+      <div class="j2-card-t"><span class="j2-num">1</span>可观察特征</div>
+      <div class="j2-card-s">回答里能直接指认的东西：有没有编号、有没有这一步、出现没出现某个字段。</div>
+    </div>
+    <div class="j2-card j2-amber">
+      <div class="j2-card-t"><span class="j2-num">2</span>每档正反例</div>
+      <div class="j2-card-s">每个档位配一条能过的和一条不能过的原句，档与档的界线才不是形容词。</div>
+    </div>
+    <div class="j2-card j2-green">
+      <div class="j2-card-t"><span class="j2-num">3</span>明确不扣分的情形</div>
+      <div class="j2-card-s">写清哪些缺失不算失败，否则裁判会把"没提到"一律当失败。</div>
+    </div>
+  </div>
+
+  <div class="j2-sym">
+    <div class="j2-card j2-red">
+      <div class="j2-sym-t">缺第 1 样</div>
+      <div class="j2-card-s">只剩评价词：全面、合理、专业、得体。两个人读同一句话，判出两个答案。</div>
+    </div>
+    <div class="j2-card j2-red">
+      <div class="j2-sym-t">缺第 2 样</div>
+      <div class="j2-card-s">档位靠感觉切。边界样本上裁判自己摇摆，同一份输出跑两次给两个分。</div>
+    </div>
+    <div class="j2-card j2-red">
+      <div class="j2-sym-t">缺第 3 样</div>
+      <div class="j2-card-s">尺子单向收紧。回答越短、越简洁，越容易被判成失败。</div>
+    </div>
+  </div>
+
+  <div class="j2-note">自检法：两个人各拿这条 rubric 独立判 20 条，分歧集中在哪，哪就是没写清的地方。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'j2-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>
