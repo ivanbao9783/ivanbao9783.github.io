@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图一 · 一次请求的两段路</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="cc-fig">
+  <div class="cc-head">一次请求的两段路：prefill 并行，decode 串行</div>
+
+  <div class="cc-pipe">
+    <div class="cc-pipe-row">
+      <div class="cc-pipe-label">输入 50,560 token</div>
+      <div class="cc-bar-wide">prefill：一次 GEMM，50,560 个位置并行</div>
+      <div class="cc-anno">瓶颈：FLOPS</div>
+    </div>
+    <div class="cc-arrow-down">↓</div>
+    <div class="cc-pipe-row">
+      <div class="cc-pipe-label">输出 204 token</div>
+      <div class="cc-steps">
+        <span class="cc-step">t₁</span>
+        <span class="cc-step">t₂</span>
+        <span class="cc-step">t₃</span>
+        <span class="cc-step">…</span>
+        <span class="cc-step">t₂₀₄</span>
+        <span class="cc-loop">每步依赖上一步，循环 204 次</span>
+      </div>
+      <div class="cc-anno">瓶颈：HBM 带宽</div>
+    </div>
+  </div>
+
+  <div class="cc-grid cc-grid-2" style="margin-top:14px">
+    <div class="cc-card cc-blue">
+      <div class="cc-card-t">prefill 下界</div>
+      <div class="cc-card-s">2 × 参数量 × token 数 ÷ 有效算力。50K token 在 8B 上约 809 TFLOP，秒级。</div>
+    </div>
+    <div class="cc-card cc-amber">
+      <div class="cc-card-t">decode 下界</div>
+      <div class="cc-card-s">权重字节 ÷ HBM 带宽。8B fp16 约 16 GB ÷ 3 TB/s ≈ 5–6 ms/步。</div>
+    </div>
+  </div>
+
+  <div class="cc-note">batch 摊薄权重读取；投机解码局部突破串行；chunked prefill 把长 prefill 切块插空。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'cc-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

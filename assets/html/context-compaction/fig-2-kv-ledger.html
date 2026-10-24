@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图二 · KV Cache 的显存账</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="cc-fig">
+  <div class="cc-head">KV Cache 的账：每 token 128 KiB，100K 会话 12.2 GiB</div>
+
+  <div class="cc-formula">2 × 32 层 × 8 个 KV 头 × 128 head_dim × 2 B = <b>128 KiB / token</b></div>
+
+  <div class="cc-bars">
+    <div class="cc-bar-row">
+      <div class="cc-bar-label">MHA · 32 KV 头</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill cc-blue" style="width:100%"></div></div>
+      <div class="cc-bar-val">512 KiB</div>
+    </div>
+    <div class="cc-bar-row">
+      <div class="cc-bar-label">GQA · 8 KV 头</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill cc-green" style="width:25%"></div></div>
+      <div class="cc-bar-val">128 KiB</div>
+    </div>
+    <div class="cc-bar-row">
+      <div class="cc-bar-label">MQA · 1 KV 头</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill cc-amber" style="width:3.2%"></div></div>
+      <div class="cc-bar-val">16 KiB</div>
+    </div>
+  </div>
+
+  <div class="cc-grid cc-grid-2" style="margin-top:16px">
+    <div class="cc-card cc-green">
+      <div class="cc-card-t">一个 100K 会话</div>
+      <div class="cc-card-s">100,000 × 128 KiB ≈ 12.2 GiB（13.1 GB）</div>
+    </div>
+    <div class="cc-card cc-red">
+      <div class="cc-card-t">8 个并发</div>
+      <div class="cc-card-s">≈ 98 GiB，超过 80 GB 卡的约 74.5 GiB 可用容量；还没算 16 GB 权重、激活和碎片。</div>
+    </div>
+  </div>
+
+  <div class="cc-note">GQA 让 4 个 Q 头共享一组 KV，显存降到 1/4；MLA 只存压缩 latent + 解耦 RoPE 分量。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'cc-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

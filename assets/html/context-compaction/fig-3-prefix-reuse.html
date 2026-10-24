@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图三 · 两轮请求共享前缀</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="cc-fig">
+  <div class="cc-head">第 8 轮只新增 192 个 token，前 50,560 个 token 可以整段复用</div>
+
+  <div class="cc-strip-row">
+    <div class="cc-strip-label">第 7 轮</div>
+    <div class="cc-strip">
+      <div class="cc-seg cc-gray" style="flex:13056">system+tools <span class="cc-hide-sm">13,056</span></div>
+      <div class="cc-seg cc-gray" style="flex:37504">历史 1..6</div>
+    </div>
+    <div class="cc-strip-val">50,560</div>
+  </div>
+  <div class="cc-strip-row">
+    <div class="cc-strip-label">第 8 轮</div>
+    <div class="cc-strip">
+      <div class="cc-seg cc-green" style="flex:13056">system + tools</div>
+      <div class="cc-seg cc-green" style="flex:37504">历史 1..7（共享）</div>
+      <div class="cc-seg cc-blue" style="flex:192">+192</div>
+    </div>
+    <div class="cc-strip-val">50,752</div>
+  </div>
+
+  <div class="cc-grid cc-grid-2" style="margin-top:16px">
+    <div class="cc-card cc-green">
+      <div class="cc-card-t">命中</div>
+      <div class="cc-card-s">只 prefill 新增的 192 token，TTFT 百毫秒以内。</div>
+    </div>
+    <div class="cc-card cc-red">
+      <div class="cc-card-t">不命中</div>
+      <div class="cc-card-s">重算 50,560 token，TTFT 几秒。</div>
+    </div>
+  </div>
+
+  <div class="cc-ref">
+    <span class="cc-ref-t">共享不是复制：</span>
+    <span class="cc-ref-box">块 #17<br>refcount 1</span>
+    <span class="cc-ref-arrow">→</span>
+    <span class="cc-ref-box cc-green">块 #17<br>refcount 2</span>
+    <span class="cc-ref-note">不复制，只加引用；满块不可变，partial block 被写时才复制。</span>
+  </div>
+
+  <div class="cc-note">多轮对话在服务端就是多条独立请求；这种复用属于 prefix cache，不是请求内 KV。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'cc-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

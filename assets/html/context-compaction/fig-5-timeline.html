@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图五 · 两段卡顿的时间线</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="cc-fig">
+  <div class="cc-head">同一条会话上的两段卡顿：压缩调用慢在 decode，压缩后首轮慢在 prefill</div>
+
+  <div class="cc-timeline">
+    <div class="cc-tl-col">
+      <div class="cc-tl-k">第 N 轮</div>
+      <div class="cc-tl-v cc-tl-green">TTFT ~100 ms</div>
+      <div class="cc-tl-s">新增 ~200 token，前缀命中</div>
+    </div>
+    <div class="cc-tl-col">
+      <div class="cc-tl-k">压缩调用</div>
+      <div class="cc-tl-v cc-tl-amber">总时长 40–60 s</div>
+      <div class="cc-tl-s">180K 上下文，decode 2K 摘要</div>
+    </div>
+    <div class="cc-tl-col">
+      <div class="cc-tl-k">第 N+1 轮</div>
+      <div class="cc-tl-v cc-tl-red">TTFT 0.5–1 s</div>
+      <div class="cc-tl-s">命中 13,056，重算 16,944</div>
+    </div>
+    <div class="cc-tl-col">
+      <div class="cc-tl-k">之后</div>
+      <div class="cc-tl-v cc-tl-green">TTFT ~100 ms</div>
+      <div class="cc-tl-s">在新 30K 前缀上继续</div>
+    </div>
+  </div>
+
+  <div class="cc-kv">
+    <div class="cc-kv-row">
+      <div class="cc-kv-label">KV 占用</div>
+      <div class="cc-kv-track">
+        <div class="cc-kv-fill cc-gray" style="width:86%">180K 旧 KV</div>
+        <div class="cc-kv-fill cc-red" style="width:8%">+17K</div>
+      </div>
+      <div class="cc-kv-val">≈ 197K · 24 GiB</div>
+    </div>
+    <div class="cc-kv-note">旧 180K KV 未淘汰前，压缩不会立刻省显存；它先让显存更紧张。</div>
+  </div>
+
+  <div class="cc-grid cc-grid-2" style="margin-top:14px">
+    <div class="cc-card cc-amber">
+      <div class="cc-card-t">第一段：慢在 decode</div>
+      <div class="cc-card-s">每步读 16 GB 权重 + 22 GiB KV，2K 步就是几十秒。</div>
+    </div>
+    <div class="cc-card cc-red">
+      <div class="cc-card-t">第二段：慢在 prefill</div>
+      <div class="cc-card-s">断点之后 16,944 token 重新算，TTFT 从 100 ms 跳到秒级。</div>
+    </div>
+  </div>
+
+  <div class="cc-note">压缩买到的是窗口容量，付出的是一次长上下文 decode + 一次 1.7 万 token 的 prefill。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'cc-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>

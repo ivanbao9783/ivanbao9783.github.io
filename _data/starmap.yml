@@ -141,6 +141,7 @@ clusters:
         y: 604
         posts:
           - 2026-10-13-llm-sampling-params.md
+          - 2026-10-23-context-compaction-prefix-cache.md
       - id: training
         title: 训练知识
         status: planned

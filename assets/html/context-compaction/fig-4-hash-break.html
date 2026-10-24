@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图四 · 链式哈希与压缩后的断裂</title>
+<link rel="stylesheet" href="fig-style.css">
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(m){root.setAttribute('data-mode',m||'light')}
+  try{
+    var pd=window.parent.document.documentElement,m=pd.getAttribute('data-mode');
+    if(m){
+      set(m);
+      new MutationObserver(function(){set(pd.getAttribute('data-mode'))}).observe(pd,{attributes:true,attributeFilter:['data-mode']});
+      return;
+    }
+  }catch(e){}
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  set(mq.matches?'dark':'light');
+  mq.addEventListener('change',function(e){set(e.matches?'dark':'light')});
+})();
+</script>
+</head>
+<body>
+<div class="cc-fig">
+  <div class="cc-head">块哈希是链式的：改一块，后面全变</div>
+
+  <div class="cc-chain">
+    <span class="cc-node">B₀</span>
+    <span class="cc-link"></span>
+    <span class="cc-node">B₁</span>
+    <span class="cc-link"></span>
+    <span class="cc-node">B₂</span>
+    <span class="cc-link"></span>
+    <span class="cc-node">…</span>
+    <span class="cc-link"></span>
+    <span class="cc-node cc-red">B₂₀₄</span>
+    <span class="cc-link"></span>
+    <span class="cc-node cc-red">B₂₀₅</span>
+    <span class="cc-link"></span>
+    <span class="cc-node cc-red">…</span>
+  </div>
+  <div class="cc-formula cc-formula-sm">hᵢ = H(hᵢ₋₁, blockᵢ)；第 204 块被改写，后面所有哈希失效</div>
+
+  <div class="cc-strip-row" style="margin-top:14px">
+    <div class="cc-strip-label">压缩前</div>
+    <div class="cc-strip">
+      <div class="cc-seg cc-gray" style="flex:2813">2,813 块 · 180K</div>
+    </div>
+    <div class="cc-strip-val">180K</div>
+  </div>
+  <div class="cc-strip-row">
+    <div class="cc-strip-label">压缩后</div>
+    <div class="cc-strip">
+      <div class="cc-seg cc-green" style="flex:204">204 块共享</div>
+      <div class="cc-seg cc-blue" style="flex:265">265 块新前缀</div>
+    </div>
+    <div class="cc-strip-val">30K</div>
+  </div>
+
+  <div class="cc-grid cc-grid-2" style="margin-top:14px">
+    <div class="cc-card cc-green">
+      <div class="cc-card-t">共享 13,056 · 43.5%</div>
+      <div class="cc-card-s">system + tools 还在原位，仍能命中。</div>
+    </div>
+    <div class="cc-card cc-red">
+      <div class="cc-card-t">重算 16,944 · 56.5%</div>
+      <div class="cc-card-s">摘要、最近几轮、本轮新增全部落在断点之后。</div>
+    </div>
+  </div>
+
+  <div class="cc-note">位置也参与缓存：RoPE 让 key 与位置绑定，原文没变、位置变了，K/V 也不能复用。</div>
+</div>
+<script>
+(function(){
+  function post(){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    try{window.parent.postMessage({type:'cc-height',h:h},'*')}catch(e){}
+  }
+  window.addEventListener('load',post);
+  if(window.ResizeObserver){new ResizeObserver(post).observe(document.body)}
+  setTimeout(post,60);
+})();
+</script>
+</body>
+</html>
